@@ -1,0 +1,27 @@
+/* CSS declarations go here */
+.json-object {
+	white-space: pre;
+}
+.json-object:before {
+	content: "{";
+}
+.json-object:after {
+	content: "}";
+}
+
+.json-object .attribute {
+	min-width: 1em;
+	margin-left: 1em;
+}
+.json-object .attribute.key:before {
+	content: '"';
+}
+.json-object .attribute.key {
+}
+.json-object .attribute.key:after {
+	content: '":';
+}
+
+.json-object .attribute.value:before {
+	
+}

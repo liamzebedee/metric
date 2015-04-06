@@ -1,0 +1,23 @@
+<head>
+  <title>metric</title>
+</head>
+
+<body>
+  <h1>{metric}</h1>
+
+  {{> hello}}
+  {{> addRecord}}
+</body>
+
+<template name="hello">
+<!-- 	<input type="text" placeholder="What do you want to do?"/><button>Search</button>
+ -->
+ 	<button id="add">Add metric</button>
+ 	<button id="show">Show things</button>
+ </template>
+
+<template name="addRecord">
+<div class="json-object">
+	<span contenteditable="true" class="attribute key">dogma</span><span contenteditable="true" class="attribute value">false</span>
+</div>
+</template>
