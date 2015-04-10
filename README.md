@@ -16,3 +16,8 @@ Key points:
 
 ## License
 Let's call it GPLv3 for now...
+
+
+http://estools.github.io/esquery/
+http://esprima.org/doc/index.html
+http://pegjs.org/
