@@ -1,6 +1,8 @@
 {metric}
 ========
 
+[Progress through Tumblr screenshots](http://liamz.tumblr.com/tagged/metric)
+
 An **in-progress** alternative to Excel I'm building to keep track of different metrics for self-improvement. Could probably be used for other things too. 
 
 Key points:
@@ -17,7 +19,8 @@ Key points:
 ## License
 Let's call it GPLv3 for now...
 
-
-http://estools.github.io/esquery/
-http://esprima.org/doc/index.html
-http://pegjs.org/
+## Thanks
+This uses these projects:
+ - Meteor
+ - React.js
+ - classNames

@@ -1,4 +1,8 @@
-/* CSS declarations go here */
+.hide {
+	display: none;
+}
+
+
 .json-object {
 	white-space: pre;
 }
