@@ -3,13 +3,15 @@
 
 [Progress through Tumblr screenshots](http://liamz.tumblr.com/tagged/metric)
 
+![Screenshot as of 12/04/2015](http://40.media.tumblr.com/2da3fff026cd7b570e1c3f463390a932/tumblr_nmp1s2upRV1trskuwo1_1280.png)
+
 An **in-progress** alternative to Excel I'm building to keep track of different metrics for self-improvement. Could probably be used for other things too. 
 
 Key points:
  - unlike Excel, we don't do tables
  - we do metrics and records
  - metrics are dynamically computed, a record is just a JSON object
- - it's all built with web tech, it's real-time using Meteor
+ - it's all built with web tech, it's real-time using Meteor and React
 
 ## Install
  1. Install [Meteor](https://www.meteor.com/)
@@ -24,3 +26,4 @@ This uses these projects:
  - Meteor
  - React.js
  - classNames
+ - [javascript-editor](https://github.com/maxogden/javascript-editor), and subsequently Esprima and CodeMirror

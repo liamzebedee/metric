@@ -1,6 +1,10 @@
 /*
  * @jsx React.DOM
  */
+'use strict';
+
+var Metrics = new Mongo.Collection("metrics");
+var Records = new Mongo.Collection("records");
 
 var UI = ReactMeteor.createClass({
 	templateName: "UI",
@@ -14,18 +18,24 @@ var UI = ReactMeteor.createClass({
 
 	render: function() {
 		return (
-			<div className="container">
-				<UI.Menu on_add_metric_click={this.toggle_add_metric_form} />
-				
-				<div className="ui page grid">
-				<main className="column">
-	  				<UI.Segment title="Add Metric" hidden={!this.state.add_metric_shown}>
-		  			</UI.Segment>
+			<div>
+				<div className="container">
+					<UI.Menu on_add_metric_click={this.toggle_add_metric_form} />
+					
+					<div className="ui page grid">
+					<main className="column">
+		  				<UI.Segment title="Add Metric" hidden={!this.state.add_metric_shown}>
+			  			</UI.Segment>
 
-	  				<UI.Metric />
-	  				<UI.Record />	
-				</main>
+			  			<div className="ui statistics">
+		  				<UI.Metric />
+		  				<UI.Record />	
+		  				</div>
+					</main>
+					</div>
 				</div>
+
+				<UI.JSEditor />
 			</div>
 		);
 	},
@@ -50,7 +60,7 @@ UI.Menu = ReactMeteor.createClass({
 
 			   <div className="item">
 			      <div className="ui icon input">
-			        <input type="text" placeholder="Search..."/>
+			        <input type="text" placeholder="Search..." style={{ width: '30em' }}/>
 			        <i className="search link icon"></i>
 			      </div>
 			    </div>
@@ -103,34 +113,68 @@ UI.Record = ReactMeteor.createClass({
 });
 
 UI.Metric = ReactMeteor.createClass({
+	openEditorForComputeFunction: function() {
+
+	},
+
+	getInitialState: function() {
+		return {
+			computeResult: 321,
+			label: "Number of dogs"
+		};
+	},
+
 	render: function() {
 		return (
-		<div className="ui statistics">
 		  <div className="statistic">
-		    <div className="text value">
-		      Two Million
+		    <div 
+		    	className={classNames('value', { 'text': !isNumber(this.state.computeResult) })} 
+		    	onClick={this.openEditorForComputeFunction}>
+		      {this.state.computeResult}
 		    </div>
 		    <div className="label">
-		      Homeless Dogs in USA
+		      {this.state.label}
 		    </div>
 		  </div>
-		  <div className="statistic">
-		    <div className="value">
-		      <i className="plane icon"></i> 5
-		    </div>
-		    <div className="label">
-		      Flights Piloted By Dogs
-		    </div>
-		  </div>
-		</div>
 		);
 	}
 });
 
+UI.JSEditor = ReactMeteor.createClass({
+	componentDidMount:  function() {
+		var state = {};
+		state.editor = jsEditor({
+		    value: "'use strict';\nfunction computeMetric(Metrics, Records) {\n\t// write code that will compute the metric here\n\treturn 0;\n}",
+		    mode: "javascript",
+		    lineNumbers: true,
+		    matchBrackets: true,
+		    indentWithTabs: true,
+		    tabSize: 2,
+		    indentUnit: 2,
+		    updateInterval: 500,
+		    dragAndDrop: false,
+			container: document.querySelector('#code-editor')
+		});
+		return state;
+	},
 
-Metrics = new Mongo.Collection("metrics");
-Records = new Mongo.Collection("records");
-
+	render: function() {
+		return (
+			<div id='code-editor' className="ui container">
+		    <div className="ui menu">
+		      <div className="ui big buttons" style={{ float: 'right' }}>
+		        <div className="ui button">Cancel</div>
+		        <div className="or"></div>
+		        <div className="ui positive button">Save</div>
+		      </div>
+		    </div>
+		    
+		    <div className='left'></div>
+		    <div className='right'></div>
+		  </div>
+	  );
+	}
+});
 
 var Util = {
 	timestamp: function() { return new Date().getTime(); }
@@ -161,6 +205,10 @@ function classNames() {
 	}
 	return classes.substr(1);
 }
+
+// Why is this language so complex...
+// http://stackoverflow.com/questions/1303646/check-whether-variable-is-number-or-string-in-javascript
+function isNumber(obj) { return !isNaN(parseFloat(obj)) }
 
 // Metrics.addNew = function(metricData) {
 // 	// name - BGLs
