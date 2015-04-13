@@ -10,8 +10,9 @@ An **in-progress** alternative to Excel I'm building to keep track of different 
 Key points:
  - unlike Excel, we don't do tables
  - we do metrics and records
- - metrics are dynamically computed, a record is just a JSON object
+ - metrics are dynamically computed functions written in JavaScript, a record is just a JSON object (that's right, you can store structured data *very* easily)
  - it's all built with web tech, it's real-time using Meteor and React
+ - as a result of its client-server architecture, it can be hosted and accessed from multiple clients, and the metric computation thread is separated from the UI
 
 ## Install
  1. Install [Meteor](https://www.meteor.com/)
