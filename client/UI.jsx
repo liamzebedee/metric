@@ -1,13 +1,24 @@
-/*
- * @jsx React.DOM
- */
-'use strict';
+// RouteHandler = ReactRouter.RouteHandler;
+// DefaultRoute = ReactRouter.DefaultRoute;
+// Link = ReactRouter.Link;
+// Route = ReactRouter.Route;
 
-var Metrics = new Mongo.Collection("metrics");
-var Records = new Mongo.Collection("records");
+// routes = (
+//   <Route name="ui" path="/" handler={UI}>
+//     <DefaultRoute handler={Dashboard}/>
+//   </Route>
+// );
 
-var UI = ReactMeteor.createClass({
+// ReactRouter.run(routes, function (Handler) {
+//   React.render(<RouteHandler />, document.getElementById('root'));
+// });
+
+// http://enome.github.io/javascript/2014/05/09/lets-create-our-own-router-component-with-react-js.html
+
+
+UI = ReactMeteor.createClass({
 	templateName: "UI",
+
 
 	toggle_add_metric_form: function() {
 		this.setState({ add_metric_shown: !this.state.add_metric_shown });
@@ -24,18 +35,14 @@ var UI = ReactMeteor.createClass({
 					
 					<div className="ui page grid">
 					<main className="column">
-		  				<UI.Segment title="Add Metric" hidden={!this.state.add_metric_shown}>
+						<UI.Segment title="Add Metric" hidden={!this.state.add_metric_shown}>
+		  					<UI.AddMetric />
 			  			</UI.Segment>
 
-			  			<div className="ui statistics">
-		  				<UI.Metric />
-		  				<UI.Record />	
-		  				</div>
+
 					</main>
 					</div>
 				</div>
-
-				<UI.JSEditor />
 			</div>
 		);
 	},
@@ -69,10 +76,10 @@ UI.Menu = ReactMeteor.createClass({
 				<i className="home icon"></i> Overview
 			  </a>
 			  <a className="item" onClick={this.props.on_add_metric_click}>
-				<i className="mail icon"></i> Add metric
+				<i className="plus icon"></i> Add metric
 			  </a>
 			  <a className="item">
-				<i className="user icon"></i> Add record
+				<i className="plus icon"></i> Add record
 			  </a>
 			  
 			</nav>
@@ -84,7 +91,7 @@ UI.Menu = ReactMeteor.createClass({
 
 UI.Segment = ReactMeteor.createClass({
 	render: function() {
-		var cn = "ui segment " + classNames({'hide': this.props.hidden});
+		var cn = "ui segment " + Util.classNames({'hide': this.props.hidden});
 
 		return (
 			<div className={cn}>
@@ -128,7 +135,7 @@ UI.Metric = ReactMeteor.createClass({
 		return (
 		  <div className="statistic">
 		    <div 
-		    	className={classNames('value', { 'text': !isNumber(this.state.computeResult) })} 
+		    	className={Util.classNames('value', { 'text': !Util.isNumber(this.state.computeResult) })} 
 		    	onClick={this.openEditorForComputeFunction}>
 		      {this.state.computeResult}
 		    </div>
@@ -176,75 +183,16 @@ UI.JSEditor = ReactMeteor.createClass({
 	}
 });
 
-var Util = {
-	timestamp: function() { return new Date().getTime(); }
-};
-
-function classNames() {
-	var classes = '';
-	var arg;
-
-	for (var i = 0; i < arguments.length; i++) {
-		arg = arguments[i];
-		if (!arg) {
-			continue;
-		}
-
-		if ('string' === typeof arg || 'number' === typeof arg) {
-			classes += ' ' + arg;
-		} else if (Object.prototype.toString.call(arg) === '[object Array]') {
-			classes += ' ' + classNames.apply(null, arg);
-		} else if ('object' === typeof arg) {
-			for (var key in arg) {
-				if (!arg.hasOwnProperty(key) || !arg[key]) {
-					continue;
-				}
-				classes += ' ' + key;
-			}
-		}
+UI.AddMetric = ReactMeteor.createClass({
+	render: function() {
+		return (
+			<p>asdsa</p>
+			);
 	}
-	return classes.substr(1);
-}
+});
 
-// Why is this language so complex...
-// http://stackoverflow.com/questions/1303646/check-whether-variable-is-number-or-string-in-javascript
-function isNumber(obj) { return !isNaN(parseFloat(obj)) }
-
-// Metrics.addNew = function(metricData) {
-// 	// name - BGLs
-// 	// category - /Health/Diabetes
-// 	// compute(metrics, records)
-	
-// 	parse category
-// 	jsobj = metrics
-// 	foreach part of category.split('/')[1-end]
-// 		jsobj = jsobj[part]
-// 	jsonobj[name] = { metric_id: nextID(), metric_timestamp: currentTime(), compute: compute }
-	
-// };
-
-// Records.addNew = function(newRecord) {
-// 	// var record = {
-// 	// 	metric_id: nextID(),
-// 	// 	metric_timestamp: currentTime(),
-// 	// 	...data
-// 	// };
-// 	// jsobj = metrics
-// 	// foreach part of category.split('/')[1-end]
-// 	// 	jsobj = jsobj[part]
-// 	// jsonobj[name].push(record)
-// };
-
-// use JS AST to analyse Metric.compute, and analyse dependencies between variables to create a better update algorithm
-// metric.compute(Metrics.copy, Records.copy) foreach metric
-// memoization for caching computations
-// TODO implement a view syntax
-
-// http://estools.github.io/esquery/
-// http://esprima.org/doc/index.html
-// http://pegjs.org/
-
-if (Meteor.isServer) {
-	Meteor.startup(function () {
-	});
-}
+// UI.AddRecord = ReactMeteor.createClass({
+// 	render: function() {
+// 		return ();
+// 	}
+// });

@@ -21,6 +21,9 @@ Key points:
 ## License
 Let's call it GPLv3 for now...
 
+## Development practices
+I admit this project does not adhere to several development practices -- the reason for this is that I am trying to develop it as quickly as possible and don't have time for dealing with the inadequacies of the Meteor packaging system, among other things.
+
 ## Thanks
 This uses these projects:
  - Meteor
