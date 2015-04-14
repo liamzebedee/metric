@@ -3,62 +3,27 @@ DefaultRoute = ReactRouter.DefaultRoute;
 Link = ReactRouter.Link;
 Route = ReactRouter.Route;
 
-Dashboard = ReactMeteor.createClass({
-  contextTypes: {
-    router: React.PropTypes.func.isRequired
-  },
-
-	render: function() {
-		return (
-			<div className="ui statistics">
-				<h1>Dashboard</h1>
-				<UI.Metric />
-			</div>
-			);
-	}
-});
-
 
 App = ReactMeteor.createClass({
 	contextTypes: {
 	    router: React.PropTypes.func.isRequired
 	},
 
-	toggle_add_metric_form: function() {
-		this.setState({ add_metric_shown: !this.state.add_metric_shown });
-	},
-	toggle_add_record_form: function() {
-		this.setState({ add_record_shown: !this.state.add_record_shown });
-	},
-
 	render: function() {
 		return (
 			<div>
 				<div className="container">
-					<UI.Menu on_add_metric_click={this.toggle_add_metric_form} />
+					<UI.Menu/>
 					
 					<div className="ui page grid">
 					<main className="column">
-						<UI.Segment title="Add Metric" hidden={!this.state.add_metric_shown}>
-		  					<UI.AddMetric />
-			  			</UI.Segment>
-
 			  			<RouteHandler/>
 					</main>
 					</div>
 				</div>
 			</div>
 		);
-	},
-
-	getInitialState: function() {
-		return {
-			add_metric_shown: false,
-			add_record_shown: false
-		};
-	},
-
-	getMeteorState: function() {}
+	}
 });
 
 UI = ReactMeteor.createClass({
@@ -82,21 +47,20 @@ UI.Menu = ReactMeteor.createClass({
 			      </div>
 			    </div>
 
-			  <a className="item">
+
+			  <Link to="dashboard" className="item">
 				<i className="home icon"></i> Overview
-			  </a>
-			  <a className="item" onClick={this.props.on_add_metric_click}>
+			  </Link>
+			  <Link to="add-metric" className="item">
 				<i className="plus icon"></i> Add metric
-			  </a>
-			  <a className="item">
+			  </Link>
+			  <Link to="add-record" className="item">
 				<i className="plus icon"></i> Add record
-			  </a>
+			  </Link>
 			  
 			</nav>
 		);
-	},
-
-	getMeteorState: function() {}
+	}
 });
 
 UI.Segment = ReactMeteor.createClass({
@@ -201,15 +165,82 @@ UI.AddMetric = ReactMeteor.createClass({
 	}
 });
 
-// UI.AddRecord = ReactMeteor.createClass({
-// 	render: function() {
-// 		return ();
-// 	}
-// });
+AddMetric = ReactMeteor.createClass({
+	contextTypes: {
+	    router: React.PropTypes.func.isRequired
+	  },
+
+	render: function() {
+		return (
+			<UI.Segment title="Add Metric">
+				<UI.AddMetric />
+  			</UI.Segment>
+		);
+	}
+});
+
+AddRecord = ReactMeteor.createClass({
+	contextTypes: {
+    router: React.PropTypes.func.isRequired
+  },
+
+	render: function() {
+		return (
+			<UI.Segment title="Add Record">
+				<UI.AddMetric />
+  			</UI.Segment>
+		);
+	}
+});
+
+Dashboard = ReactMeteor.createClass({
+  contextTypes: {
+    router: React.PropTypes.func.isRequired
+  },
+
+	render: function() {
+		return (
+			<div className="ui statistics">
+				<h1>Dashboard</h1>
+				<UI.Metric />
+			</div>
+			);
+	}
+});
+
+MetricOverview = ReactMeteor.createClass({
+	contextTypes: {
+    router: React.PropTypes.func.isRequired
+  },
+
+	render: function() {
+		return (
+			<h1>Metric Overview</h1>
+		);
+	}
+});
+
+RecordsOverview = ReactMeteor.createClass({
+	contextTypes: {
+    router: React.PropTypes.func.isRequired
+  },
+
+	render: function() {
+		return (
+			<h1>Metric Overview</h1>
+		);
+	}
+});
 
 routes = (
-  <Route handler={App} path="/">
-    <DefaultRoute handler={Dashboard}/>
+  <Route name="app" handler={App} path="/">
+  	<Route name="add-metric" path="/metrics/add" handler={AddMetric} />
+  	<Route name="add-record" path="/records/add" handler={AddRecord} />
+
+  	<Route name="metric-overview" path="/metrics/:id" handler={MetricOverview} />
+  	<Route name="records-overview" path="/records-overview/*/" handler={RecordsOverview} />
+  	<Route name="dashboard" path="/" handler={Dashboard} />
+    <DefaultRoute handler={Dashboard} />
   </Route>
 );
 
