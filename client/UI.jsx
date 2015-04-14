@@ -1,24 +1,28 @@
-// RouteHandler = ReactRouter.RouteHandler;
-// DefaultRoute = ReactRouter.DefaultRoute;
-// Link = ReactRouter.Link;
-// Route = ReactRouter.Route;
+RouteHandler = ReactRouter.RouteHandler;
+DefaultRoute = ReactRouter.DefaultRoute;
+Link = ReactRouter.Link;
+Route = ReactRouter.Route;
 
-// routes = (
-//   <Route name="ui" path="/" handler={UI}>
-//     <DefaultRoute handler={Dashboard}/>
-//   </Route>
-// );
+Dashboard = ReactMeteor.createClass({
+  contextTypes: {
+    router: React.PropTypes.func.isRequired
+  },
 
-// ReactRouter.run(routes, function (Handler) {
-//   React.render(<RouteHandler />, document.getElementById('root'));
-// });
+	render: function() {
+		return (
+			<div className="ui statistics">
+				<h1>Dashboard</h1>
+				<UI.Metric />
+			</div>
+			);
+	}
+});
 
-// http://enome.github.io/javascript/2014/05/09/lets-create-our-own-router-component-with-react-js.html
 
-
-UI = ReactMeteor.createClass({
-	templateName: "UI",
-
+App = ReactMeteor.createClass({
+	contextTypes: {
+	    router: React.PropTypes.func.isRequired
+	},
 
 	toggle_add_metric_form: function() {
 		this.setState({ add_metric_shown: !this.state.add_metric_shown });
@@ -39,7 +43,7 @@ UI = ReactMeteor.createClass({
 		  					<UI.AddMetric />
 			  			</UI.Segment>
 
-
+			  			<RouteHandler/>
 					</main>
 					</div>
 				</div>
@@ -55,6 +59,12 @@ UI = ReactMeteor.createClass({
 	},
 
 	getMeteorState: function() {}
+});
+
+UI = ReactMeteor.createClass({
+	render: function() {
+		return (<div> </div>);
+	}
 });
 
 UI.Menu = ReactMeteor.createClass({
@@ -196,3 +206,15 @@ UI.AddMetric = ReactMeteor.createClass({
 // 		return ();
 // 	}
 // });
+
+routes = (
+  <Route handler={App} path="/">
+    <DefaultRoute handler={Dashboard}/>
+  </Route>
+);
+
+Meteor.startup(function() {
+	ReactRouter.run(routes, function (Handler) {
+	  React.render(<Handler />, document.getElementById('root'));
+	});
+});
