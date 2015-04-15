@@ -5,10 +5,10 @@ Not yet functional - [Progress through Tumblr screenshots](http://liamz.tumblr.c
 
 ![Screenshot as of 12/04/2015](http://40.media.tumblr.com/2da3fff026cd7b570e1c3f463390a932/tumblr_nmp1s2upRV1trskuwo1_1280.png)
 
-**What is **{metric}**:
+**What is **{metric}** (or more correctly, what am I building it to become):
  - An app I'm using to keep track of different metrics for self-improvement in a relational manner (Health tracking is dependent on metrics relating to my Diabetes, exercise, eating habits, Happiness is related to my self-actualization, social belonging, etc.)
  - A modern take on what spreadsheets are supposed to do - take data and compute things. We use Web tech, JavaScript and libraries instead of MACROS and plugins. We use objects categorised and stored in databases rather than tables (2D arrays) to represent data.
- - An experiment, and my new life work.
+ - An experiment, and my new life's work.
 
 Key points:
  - unlike Excel, we don't do tables
