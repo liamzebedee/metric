@@ -1,8 +1,4 @@
 RouteHandler = ReactRouter.RouteHandler;
-DefaultRoute = ReactRouter.DefaultRoute;
-Link = ReactRouter.Link;
-Route = ReactRouter.Route;
-
 
 App = ReactMeteor.createClass({
 	contextTypes: {
@@ -31,6 +27,8 @@ UI = ReactMeteor.createClass({
 		return (<div> </div>);
 	}
 });
+
+Link = ReactRouter.Link;
 
 UI.Menu = ReactMeteor.createClass({
 	render: function() {
@@ -141,60 +139,47 @@ UI.Metric = ReactMeteor.createClass({
 
 // });
 
-UI.JSEditor = ReactMeteor.createClass({
-	componentDidMount:  function() {
-		var state = {};
-		state.editor = jsEditor({
-		    value: "'use strict';\nfunction computeMetric(Metrics, Records) {\n\t// write code that will compute the metric here\n\treturn 0;\n}",
-		    mode: "javascript",
-		    lineNumbers: true,
-		    matchBrackets: true,
-		    indentWithTabs: true,
-		    tabSize: 2,
-		    indentUnit: 2,
-		    updateInterval: 500,
-		    dragAndDrop: false,
-			container: document.querySelector('#code-editor')
-		});
-		return state;
-	},
-
-	render: function() {
-		return (
-			<div id='code-editor' className="ui container">
-		    <div className='left'></div>
-		    <div className='right'></div>
-		  </div>
-	  );
-	}
-});
-
 AddMetric = ReactMeteor.createClass({
 	mixins: [React.addons.LinkedStateMixin],
+
+	onEditorValidation: function(newVal, noErrors) {
+		this.setState({
+			computeFunctionString: newVal,
+			computeFunctionValid: noErrors
+		});
+	},
 
 	contextTypes: {
 	    router: React.PropTypes.func.isRequired
 	  },
 
 	getInitialState: function() {
-	    return {
+		var state = {
+			resetKey: 0+new Date(), // oh I'm naughty
+
 	    	name: "",
-	    	category: ""
-	    	// state also includes state of UI.JSEditor
+	    	category: "",
+	    	computeFunctionString: "'use strict';\nfunction computeMetric(Metrics, Records) {\n\t// write code that will compute the metric here\n\treturn 0;\n}",
+	    	computeFunctionValid: true
 	    };
+	    state.jsEditor = (<UI.JSEditor 
+					    	code={state.computeFunctionString} 
+					    	onValidation={this.onEditorValidation}/>);
+	    return state;
 	  },
 
 	 clearForm: function() {
-	 	//  TODO
+	 	this.replaceState(this.getInitialState());
 	 },
 
 	 submitForm: function() {
-	 	// TODO
+	 	Metrics.addMetric(this.state.name, this.state.category, this.state.computeFunctionString);
+	 	this.clearForm();
 	 },
 
 	render: function() {
 		return (
-			<div>
+			<div key={this.state.resetKey}>
 				<div className="ui segment">
 			      
 			     <h1 style={{ display: 'inline-block' }}>Add Metric</h1>
@@ -202,7 +187,7 @@ AddMetric = ReactMeteor.createClass({
 			      <span className="ui big buttons" style={{ display: 'inline-block', 'float': 'right' }}>
 			        <button className="ui button" onClick={this.clearForm}><i className="remove icon"></i>Clear</button>
 			        <div className="or"></div>
-			        <button className="ui positive button" onClick={this.submitForm}><i className="add circle icon"></i>Submit</button>
+			        <button className={ Util.classNames("ui positive button", { 'disabled': !this.state.computeFunctionValid }) } onClick={this.submitForm}><i className="add circle icon"></i>Submit</button>
 			      </span>
 
 					<form className="ui form">
@@ -216,7 +201,7 @@ AddMetric = ReactMeteor.createClass({
 						    <div className="required field">
 						      <label>Category</label>
 						      <div className="ui icon input">
-						        <input type="text" placeholder="Health" valueLink={this.linkState('category')}/>
+						        <input type="text" placeholder="/Health/Physical" valueLink={this.linkState('category')}/>
 						        <i className="search link icon"></i>
 						      </div>
 						    </div>
@@ -225,7 +210,7 @@ AddMetric = ReactMeteor.createClass({
 						<h4>Compute</h4>
 					</form>
 	  			</div>
-				<UI.JSEditor />
+				{this.state.jsEditor}
 	  		</div>
 		);
 	}
@@ -284,24 +269,39 @@ RecordsOverview = ReactMeteor.createClass({
 	}
 });
 
-routes = (
-  <Route name="app" handler={App} path="/">
-  	<Route name="add-metric" path="/metrics/add" handler={AddMetric} />
-  	<Route name="add-record" path="/records/add" handler={AddRecord} />
 
-  	<Route name="metric-overview" path="/metrics/:id" handler={MetricOverview} />
-  	<Route name="records-overview" path="/records-overview/*/" handler={RecordsOverview} />
-  	<Route name="dashboard" path="/" handler={Dashboard} />
-    <DefaultRoute handler={Dashboard} />
-  </Route>
-);
+UI.JSEditor = ReactMeteor.createClass({
+	componentDidMount:  function() {
+		var editor = jsEditor({
+		    value: this.props.code,
+		    mode: "javascript",
+		    lineNumbers: true,
+		    matchBrackets: true,
+		    indentWithTabs: true,
+		    tabSize: 2,
+		    indentUnit: 2,
+		    updateInterval: 500,
+		    dragAndDrop: false,
+			container: document.querySelector('#code-editor')
+		});	
+		var _this = this;
+		editor.on('valid', function(noErrors) {
+			// BUG in jsEditor meaning that when there are no errors it returns undefined
+			// We set it to true here so it makes sense
+			if(noErrors != false) noErrors = true;
+			_this.props.onValidation(editor.getValue(), noErrors);
+		});
+	},
 
-Meteor.startup(function() {
-	ReactRouter.run(routes, function (Handler) {
-	  React.render(<Handler />, document.getElementById('root'));
-	});
+	render: function() {
+		return (
+			<div id='code-editor' className="ui container">
+		    <div className='left'></div>
+		    <div className='right'></div>
+		  </div>
+	  );
+	}
 });
-
 
 // A bit of inspiration for this project has come from Douglas Adams' "Dirk Gently's Holistic Detective Agency", from a particular section of the novel where Richard MacDuff is discussing a program he created back in the 80s, which is a sort of spreadsheeting application that turns numerical data into music. Aside from the obvious facetiousness which follows the rest of the novel, this particular idea (which hasn't been executed to my knowledge) posseses a certain childlike naivety to it - "why not? we can see data, we can touch it, why can't we hear it".
 // And so, why not?
