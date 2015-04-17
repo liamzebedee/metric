@@ -1,5 +1,4 @@
-// Categories is basically how Wikipedia does Categories, except Metrics and Records can only belong to one
-// TODO implement this
+// Category = { path: ["Top Level Cat", "Second Level Cat"] }
 Categories = new Mongo.Collection("categories");
 Categories.addCategory = function(fullCategoryPath) {
 	category = {
@@ -7,7 +6,23 @@ Categories.addCategory = function(fullCategoryPath) {
 	};
 };
 Categories.findOrCreateByCategoryPath = function(categoryPath) {
-	// TODO
+	// categoryPath - "/Category1/Category2"
+	categoryPath = categoryPath.split('/').filter(function(e){if(e !== "") return true});
+
+	var category = Categories.findOne({
+		path: categoryPath
+	});
+	var category_id;
+	// stupid Meteor docs, it actually returns undefined, not null
+	if(category == null) {
+		category_id = Categories.insert({
+			path: categoryPath
+		});
+	} else {
+		category_id = category_id._id;
+	}
+
+	return category_id;
 };
 
 
@@ -34,7 +49,7 @@ Records = new Mongo.Collection("records");
 
 Records.addRecord = function(category, timestamp, data) {
 	var record = {
-		timestamp: 12321
+		timestamp: 12321,
 		category: Categories.findOrCreateByCategoryPath(fullCategoryPathString),
 		data: data
 	};
