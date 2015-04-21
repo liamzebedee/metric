@@ -159,7 +159,9 @@ AddMetric = ReactMeteor.createClass({
 
 	    	name: "",
 	    	category: "",
-	    	computeFunctionString: "'use strict';\nfunction computeMetric(Metrics, Records) {\n\t// write code that will compute the metric here\n\treturn 0;\n}",
+	    	computeFunctionString: "// use metric.Metrics and metric.Records as inputs\n\
+// metric.computeResult is your output\n\
+'use strict';\n",
 	    	computeFunctionValid: true
 	    };
 	    state.jsEditor = (<UI.JSEditor 

@@ -12,21 +12,33 @@ Categories.findOrCreateByCategoryPath = function(categoryPath) {
 	var category = Categories.findOne({
 		path: categoryPath
 	});
-	var category_id;
+	var categoryId;
 	// stupid Meteor docs, it actually returns undefined, not null
 	if(category == null) {
-		category_id = Categories.insert({
+		categoryId = Categories.insert({
 			path: categoryPath
 		});
 	} else {
-		category_id = category_id._id;
+		categoryId = categoryId._id;
 	}
 
-	return category_id;
+	return categoryId;
 };
 
-
 Metrics = new Mongo.Collection("metrics");
+Metrics.runComputeFunction = function(computeFunctionCodeString) {
+	var func = Function('metric', computeFunctionCodeString);
+	metric = {
+		Metrics: {},
+		Records: {},
+		computeResult: {}
+	};
+	func(metric);
+	return metric.computeResult;
+};
+
+// Use esprima.js to parse what the user gave us, taking simply the computeFunction JS
+// 
 Metrics.addMetric = function(name, fullCategoryPathString, computeFunctionCodeString) {
 	// locate/create category in JSON tree
 	var metricData = {
@@ -36,14 +48,24 @@ Metrics.addMetric = function(name, fullCategoryPathString, computeFunctionCodeSt
 		categoryId: Categories.findOrCreateByCategoryPath(fullCategoryPathString)
 	};
 
-	// Metrics.insert(metricData, function(err, _id){
+	var metric_id;
+	Metrics.insert(metricData, function(err, _id){
+		mertric_id = _id;
+	});
 
-	// });
+	// TODO how to get the method defined by the code
+	
 
 	// Add watch
+
+	return _id;
 };
 
 
+/*
+When to compute a metric:
+ - 
+*/
 
 Records = new Mongo.Collection("records");
 
