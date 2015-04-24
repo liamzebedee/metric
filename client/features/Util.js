@@ -31,3 +31,13 @@ Util.classNames = function() {
 // Why is this language so complex...
 // http://stackoverflow.com/questions/1303646/check-whether-variable-is-number-or-string-in-javascript
 Util.isNumber = function(obj) { return !isNaN(parseFloat(obj)) };
+
+Util.getObjectType = function(obj) {
+	var type = "";
+	if(typeof obj === "object") {
+		type = obj.constructor.name;
+	} else {
+		type = typeof obj;
+	}
+	return type;
+};

@@ -265,7 +265,7 @@ AddRecord = ReactMeteor.createClass({
 		for(fieldName in this.state.fields) {
 			var field = this.state.fields[fieldName];
 			var fieldView = null;
-			switch(typeof field.value) {
+			switch(Util.getObjectType(field.value)) {
 				case 'string':
 					fieldView = (<UI.JSONString name={fieldName} value={field.value}/>);
 					break;
@@ -278,8 +278,18 @@ AddRecord = ReactMeteor.createClass({
 				case 'Date':
 					fieldView = (<UI.JSONDateTime name={fieldName} value={field.value}/>);
 					break;
+				default:
+					console.log("Error: field type isn't recognised "+(typeof field.value));
 			}
-			fieldsView.push(fieldView);
+			fieldsView.push((
+				<div key={fieldName}>
+					{fieldView}
+
+
+					<button className="ui blue icon button"><i className="edit icon" onClick={this.editField}></i> Edit</button>
+					<button className="ui red icon button"><i className="minus square icon" onClick={this.deleteField}></i> Delete</button>
+				</div>
+			));
 		};
 
 		return (
@@ -306,12 +316,11 @@ AddRecord = ReactMeteor.createClass({
 						</div>
 
 						<h4 className="ui dividing header">Fields</h4>
+						{fieldsView}
+
+						<br/><br/>
 						
 						<AddRecord.FieldTypeSelector />
-						<i className="remove icon"></i> Reset
-						<i className="edit icon"></i> Edit
-						<i className="minus square icon"></i> Delete
-						{fieldsView}
 
 						<button>Add field</button>
 					</div>
@@ -328,6 +337,7 @@ AddRecord.FieldTypeSelector = ReactMeteor.createClass({
 
 	getInitialState: function() {
 		var state = {
+			selectedType: '',
 			types: [
 				{
 					name: 'Number',
@@ -353,12 +363,11 @@ AddRecord.FieldTypeSelector = ReactMeteor.createClass({
 	render: function() {
 		var typesView = [];
 		this.state.types.forEach(function(type) {
-			typesView.push(<div className="item" data-value="ad"><i className={"icon "+type.icon}></i>{type.name}</div>);
+			typesView.push(<div className="item" key={type.name}><i className={"icon "+type.icon}></i>{type.name}</div>);
 		});
 
 		return (
 		<div className="ui fluid search selection dropdown" ref="dropdown">
-		  <input type="hidden" name="country" />
 		  <i className="dropdown icon"></i>
 		  <div className="default text">Select Country</div>
 		  <div className="menu">
@@ -372,13 +381,13 @@ AddRecord.FieldTypeSelector = ReactMeteor.createClass({
 UI.JSONDateTime = ReactMeteor.createClass({
 	render: function() {
 		return (
-		<div className="required field">
+			<div className="required field">
 		      <label>{this.props.name}</label>
 		      <div className="ui input">
 		        <input type="datetime"/>
 		      </div>
 		    </div>
-			);
+		);
 	}
 });
 
@@ -395,12 +404,26 @@ UI.JSONNumber = ReactMeteor.createClass({
 	}
 });
 UI.JSONString = ReactMeteor.createClass({
+	mixins: [React.addons.LinkedStateMixin],
+
+	getInitialState: function() {
+		return { value: this.props.value, name: this.props.name };
+	},
+
 	render: function() {
+		var needTextArea = this.state.value.length > 90;
+		var input;
+		if(needTextArea) {
+			input = <textarea valueLink={this.linkState('value')}></textarea>;
+		} else {
+			input = <input type="text" placeholder={this.state.placeholder} valueLink={this.linkState('value')}/>;
+		}
+
 		return (
 		<div className="required field">
-		      <label>{this.props.name}</label>
-		      <div className="ui icon input">
-		        <input type="text" placeholder="Username" />
+		      <label>{this.state.name}</label>
+		      <div className={Util.classNames("ui icon", {'input':!needTextArea})}>
+		        {input}
 		      </div>
 		    </div>
 			);
