@@ -9,3 +9,7 @@ autopublish
 insecure
 semantic:ui-css
 reactjs:react
+meteorhacks:npm
+
+
+npm-container

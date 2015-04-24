@@ -37,8 +37,6 @@ Metrics.runComputeFunction = function(computeFunctionCodeString) {
 	return metric.computeResult;
 };
 
-// Use esprima.js to parse what the user gave us, taking simply the computeFunction JS
-// 
 Metrics.addMetric = function(name, fullCategoryPathString, computeFunctionCodeString) {
 	// locate/create category in JSON tree
 	var metricData = {
@@ -58,13 +56,14 @@ Metrics.addMetric = function(name, fullCategoryPathString, computeFunctionCodeSt
 
 	// Add watch
 
-	return _id;
+	return metric_id;
 };
 
 
 /*
-When to compute a metric:
- - 
+When to (re)compute a metric:
+ - when metric compute definition changes
+ - when a metric/recordcategory changes that this metric depends on 
 */
 
 Records = new Mongo.Collection("records");
@@ -79,7 +78,16 @@ Records.addRecord = function(category, timestamp, data) {
 
 
 
+/*
 
+In the end I want to write the HealthMetric like this:
+
+return average(Metrics.get('/Health/DiabetesMetric'), Metrics.get('/Health/Body/ExerciseMetric'));
+
+And DiabetesMetric
+
+return average(Records.get('/Health/Body/Exercise/').since('two weeks ago'))
+*/
 
 
 
