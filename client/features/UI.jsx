@@ -121,25 +121,6 @@ UI.Metric = ReactMeteor.createClass({
 	}
 });
 
-// TODO For a later version where we abstract away the view/interface
-
-// UI.MetricInterface = ReactMeteor.createClass({
-
-// 	getInitialState: function() {
-// 		return {
-// 			renderFunc: function() {
-// 				return (
-// 				);
-// 			}
-// 		};
-// 	},
-
-// 	render: function() {
-// 		return this.state.renderFunc();
-// 	}
-
-// });
-
 AddMetric = ReactMeteor.createClass({
 	mixins: [React.addons.LinkedStateMixin],
 
@@ -230,15 +211,17 @@ AddRecord = ReactMeteor.createClass({
 		var state = {
 			resetKey: 0+new Date(), // oh I'm naughty
 
+			editingSchema: false,
+
 			fields: {
 				"String": {
 					value: ""
 				},
 				"Number": {
 					value: 6.5,
-					$step: 0.5,
-					$min: 2,
-					$max: 30
+					step: 0.5,
+					min: 2,
+					max: 30
 				},
 				"DateTime": {
 					value: new Date()
@@ -260,6 +243,10 @@ AddRecord = ReactMeteor.createClass({
 		this.clearForm();
 	},
 
+	changeEditingSchemaStatus: function() {
+		this.setState({ editingSchema: !this.state.editingSchema });
+	},
+
 	render: function() {
 		fieldsView = [];
 		for(fieldName in this.state.fields) {
@@ -270,7 +257,7 @@ AddRecord = ReactMeteor.createClass({
 					fieldView = (<UI.JSONString name={fieldName} value={field.value}/>);
 					break;
 				case 'number':
-					fieldView = (<UI.JSONNumber name={fieldName} step={field.$step} min={field.$min} max={field.$max} value={field.value}/>);
+					fieldView = (<UI.JSONNumber name={fieldName} step={field.step} min={field.min} max={field.max} value={field.value}/>);
 					break;
 				case 'boolean':
 					fieldView = (<UI.JSONBoolean name={fieldName} value={field.value}/>);
@@ -281,16 +268,32 @@ AddRecord = ReactMeteor.createClass({
 				default:
 					console.log("Error: field type isn't recognised "+(typeof field.value));
 			}
+
+			var typeCol, controlsCol;
+			if(this.state.editingSchema) { 
+				typeCol = <td><AddRecord.FieldTypeSelector /></td>;
+				controlsCol = (
+					<td>
+						<button className="ui red icon button"><i className="minus square icon" onClick={this.deleteField}></i> Delete</button>
+						<button className="ui icon button"><i className="ellipsis horizontal icon"></i></button>
+					</td>
+				);
+			}
 			fieldsView.push((
-				<div key={fieldName}>
-					{fieldView}
-
-
-					<button className="ui blue icon button"><i className="edit icon" onClick={this.editField}></i> Edit</button>
-					<button className="ui red icon button"><i className="minus square icon" onClick={this.deleteField}></i> Delete</button>
-				</div>
+			    <tr className="" key={fieldName}>
+			      <td>{fieldName}</td>
+			      <td>{fieldView}</td>
+			      {typeCol}
+			      {controlsCol}
+			    </tr>
 			));
 		};
+
+		var editingTypeHeader, editingControlsHeader;
+		if(this.state.editingSchema) {
+			editingTypeHeader = <th>Type</th>;
+			editingControlsHeader = <th>Controls</th>;
+		}
 
 		return (
 			<div style={{ padding: '1em 1em'}}>
@@ -315,12 +318,29 @@ AddRecord = ReactMeteor.createClass({
 						    </div>
 						</div>
 
-						<h4 className="ui dividing header">Fields</h4>
-						{fieldsView}
+						<header>
+							<h2 className="ui dividing header" style={{ display: 'inline-block' }}>Fields</h2>
+			      
+					      <span className="ui buttons" style={{ display: 'inline-block', 'float': 'right', 'margin-left': '1em' }}>
+							<button className="ui blue icon button" onClick={this.changeEditingSchemaStatus}><i className="edit icon"></i>{ this.state.editingSchema ? "Finish editing" : "Edit schema"}</button>
+							<button className="ui positive button"><i className="add circle icon"></i>Add new</button>
+					      </span>
+						</header>
+
+						<table className="ui celled table">
+						  <thead>
+						    <tr>
+						      <th>Name</th>
+						      <th>Value</th>
+						      {editingTypeHeader}
+						      {editingControlsHeader}
+						    </tr>
+						  </thead>
+						  <tbody>{fieldsView}</tbody>
+						</table>
 
 						<br/><br/>
 						
-						<AddRecord.FieldTypeSelector />
 
 						<button>Add field</button>
 					</div>
@@ -329,6 +349,15 @@ AddRecord = ReactMeteor.createClass({
 		);
 	}
 });
+
+  // <tfoot className="full-width">
+  //   <tr>
+  //     <th></th>
+  //     <th colSpan="4">
+//      		<button className="ui positive button"><i className="add circle icon"></i>Add new</button>
+  //     </th>
+  //   </tr>
+  // </tfoot>
 
 AddRecord.FieldTypeSelector = ReactMeteor.createClass({
 	componentDidMount: function() {
@@ -379,10 +408,14 @@ AddRecord.FieldTypeSelector = ReactMeteor.createClass({
 });
 
 UI.JSONDateTime = ReactMeteor.createClass({
+	getInitialState: function() {
+		return { value: this.props.value, name: this.props.name, isRequired: true };
+	},
+
 	render: function() {
 		return (
-			<div className="required field">
-		      <label>{this.props.name}</label>
+			<div className={Util.classNames("inline field", {"required": this.state.isRequired}) }>
+		      
 		      <div className="ui input">
 		        <input type="datetime"/>
 		      </div>
@@ -392,10 +425,14 @@ UI.JSONDateTime = ReactMeteor.createClass({
 });
 
 UI.JSONNumber = ReactMeteor.createClass({
+	getInitialState: function() {
+		return { value: this.props.value, name: this.props.name, isRequired: true };
+	},
+
 	render: function() {
 		return (
-		<div className="required field">
-		      <label>{this.props.name}</label>
+		<div className={Util.classNames("inline field", {"required": this.state.isRequired}) }>
+		      
 		      <div className="ui input">
 		        <input type="number" min={this.props.min} max={this.props.max} step={this.props.step}/>
 		      </div>
@@ -407,39 +444,32 @@ UI.JSONString = ReactMeteor.createClass({
 	mixins: [React.addons.LinkedStateMixin],
 
 	getInitialState: function() {
-		return { value: this.props.value, name: this.props.name };
+		return { value: this.props.value, name: this.props.name, isRequired: true };
 	},
 
 	render: function() {
-		var needTextArea = this.state.value.length > 90;
-		var input;
-		if(needTextArea) {
-			input = <textarea valueLink={this.linkState('value')}></textarea>;
-		} else {
-			input = <input type="text" placeholder={this.state.placeholder} valueLink={this.linkState('value')}/>;
-		}
-
 		return (
-		<div className="required field">
-		      <label>{this.state.name}</label>
-		      <div className={Util.classNames("ui icon", {'input':!needTextArea})}>
-		        {input}
-		      </div>
+		<div className={Util.classNames("inline field", {"required": this.state.isRequired}) }>
+		        <textarea className="expandable" style={{ height: '3em', 'min-height': '3em'}} valueLink={this.linkState('value')} rows="1"></textarea>
 		    </div>
 			);
 	}
 });
 UI.JSONBoolean = ReactMeteor.createClass({
+	getInitialState: function() {
+		return { value: this.props.value, name: this.props.name, isRequired: true };
+	},
+
 	componentDidMount: function() {
 		$(React.findDOMNode(this.refs.checkbox)).checkbox(); // I love React, it's so simple, refs make so much sense
 	},
 
 	render: function() {
 		return (
-			<div className="field">
+			<div className={Util.classNames("inline field", {"required": this.state.isRequired}) }>
 					    <div className="ui toggle checkbox" ref="checkbox">
 					      <input type="radio" />
-					      <label>This is the label - did I do it today?</label>
+					      
 					    </div>
 					  	</div>
 			);

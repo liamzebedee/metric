@@ -3,7 +3,8 @@
 
 Not yet functional - [Progress through Tumblr screenshots](http://liamz.tumblr.com/tagged/metric)
 
-![Screenshot as of 17/04/2015](http://41.media.tumblr.com/79cefed2f19659c8aa0f96c52f6c600f/tumblr_nmwmey0Nft1trskuwo1_1280.png)
+!["Add Record" Screenshot as of 26/04/2015](https://41.media.tumblr.com/59420d6161b1690a8ca7ab15c41cd36d/tumblr_nnerknUxIb1trskuwo1_1280.png)
+!["Add Metric" Screenshot as of 26/04/2015](https://40.media.tumblr.com/dfa641e9998abb4589254ed095848cee/tumblr_nnerknUxIb1trskuwo2_1280.png)
 
 What is **{metric}** (or more correctly, what am I building it to become):
  - An app I'm using to keep track of different metrics for self-improvement in a relational manner (Health tracking is dependent on metrics relating to my Diabetes, exercise, eating habits, Happiness is related to my self-actualization, social belonging, etc.)

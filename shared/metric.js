@@ -25,6 +25,7 @@ Categories.findOrCreateByCategoryPath = function(categoryPath) {
 	return categoryId;
 };
 
+// Metric = { name: "Foo", compute: "doSomething();var i = 2;andAnother(i);", computeResult: 1, categoryId: "..." }
 Metrics = new Mongo.Collection("metrics");
 Metrics.runComputeFunction = function(computeFunctionCodeString) {
 	var func = Function('metric', computeFunctionCodeString);
@@ -66,6 +67,7 @@ When to (re)compute a metric:
  - when a metric/recordcategory changes that this metric depends on 
 */
 
+// Record = { timestamp: 12312321, category: "...", fields: {} }
 Records = new Mongo.Collection("records");
 
 Records.addRecord = function(category, timestamp, data) {
@@ -76,6 +78,17 @@ Records.addRecord = function(category, timestamp, data) {
 	};
 };
 
+/*
+	RecordSchema = {
+		categoryId: "...",
+		fields: {
+			"field name/label": { value: "default value" },
+			"another field": { value: 12, inc: 1, max: 20, min: 10 },
+			"a date field": { value: new Date(), optional: true }
+		}
+	}
+*/
+RecordSchemas = new Mongo.Collection("record-schemas");
 
 
 /*
