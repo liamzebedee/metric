@@ -213,23 +213,28 @@ AddRecord = ReactMeteor.createClass({
 
 			editingSchema: false,
 
-			fields: {
-				"String": {
-					value: ""
-				},
-				"Number": {
-					value: 6.5,
-					step: 0.5,
-					min: 2,
-					max: 30
-				},
-				"DateTime": {
-					value: new Date()
-				},
-				"Boolean": {
-					value: true
+			recordCategory: {
+				isNew: true,
+				categoryText: "",
+				fields: {
+					"String": {
+						value: ""
+					},
+					"Number": {
+						value: 6.5,
+						step: 0.5,
+						min: 2,
+						max: 30
+					},
+					"DateTime": {
+						value: new Date()
+					},
+					"Boolean": {
+						value: true
+					}
 				}
 			}
+
 	    };
 	    return state;
 	  },
@@ -239,7 +244,6 @@ AddRecord = ReactMeteor.createClass({
 	 },
 
 	submitForm: function() {
-		Metrics.addMetric(this.state.name, this.state.category, this.state.computeFunctionString);
 		this.clearForm();
 	},
 
@@ -247,10 +251,31 @@ AddRecord = ReactMeteor.createClass({
 		this.setState({ editingSchema: !this.state.editingSchema });
 	},
 
+	searchForCategory: function() {
+		var results = [];
+		
+		var categoriesCursor = Categories.find({
+			path: new RegExp(this.state.recordCategory.categoryText)
+		}, {});
+		var num = categoriesCursor.count();
+
+		if(num == 0) {
+			this.state.recordCategory.isNew = true;
+			console.log('new');
+
+		} else if(num > 0) {
+			// found some potential categories
+			results = categoriesCursor.fetch();
+			console.log(results);
+		}
+
+		return results;
+	},
+
 	render: function() {
 		fieldsView = [];
-		for(fieldName in this.state.fields) {
-			var field = this.state.fields[fieldName];
+		for(fieldName in this.state.recordCategory.fields) {
+			var field = this.state.recordCategory.fields[fieldName];
 			var fieldView = null;
 			switch(Util.getObjectType(field.value)) {
 				case 'string':
@@ -310,18 +335,17 @@ AddRecord = ReactMeteor.createClass({
 					<div className="ui form">
 						<div className="one field">
 						    <div className="required field">
+
+
 						      <label>Category</label>
-						      <div className="ui icon input">
-						        <input type="text" placeholder="/Health/Physical/Diabetes/Blood Glucose Levels" valueLink={this.linkState('category')}/>
-						        <i className="search link icon"></i>
-						      </div>
+							  <SearchInput ref="categorySearch" placeholder="/Health/Physical/Diabetes/Blood Glucose Levels" onSearchQuery={this.searchForCategory}/>
 						    </div>
 						</div>
 
 						<header>
 							<h2 className="ui dividing header" style={{ display: 'inline-block' }}>Fields</h2>
 			      
-					      <span className="ui buttons" style={{ display: 'inline-block', 'float': 'right', 'margin-left': '1em' }}>
+					      <span className="ui buttons" style={{ display: 'inline-block', 'float': 'right', marginLeft: '1em' }}>
 							<button className="ui blue icon button" onClick={this.changeEditingSchemaStatus}><i className="edit icon"></i>{ this.state.editingSchema ? "Finish editing" : "Edit schema"}</button>
 							<button className="ui positive button"><i className="add circle icon"></i>Add new</button>
 					      </span>
@@ -450,7 +474,7 @@ UI.JSONString = ReactMeteor.createClass({
 	render: function() {
 		return (
 		<div className={Util.classNames("inline field", {"required": this.state.isRequired}) }>
-		        <textarea className="expandable" style={{ height: '3em', 'min-height': '3em'}} valueLink={this.linkState('value')} rows="1"></textarea>
+		        <textarea className="expandable" style={{ height: '3em', minHeight: '3em'}} valueLink={this.linkState('value')} rows="1"></textarea>
 		    </div>
 			);
 	}
@@ -549,6 +573,55 @@ UI.JSEditor = ReactMeteor.createClass({
 	  );
 	}
 });
+
+
+SearchInput = ReactMeteor.createClass({
+	mixins: [React.addons.LinkedStateMixin],
+
+	componentDidMount: function(){
+		var _this = this;
+		$(React.findDOMNode(this.refs.search)).search({
+		    source: this.state.results,
+		    searchFields: [
+		      'title'
+		    ],
+		    searchFullText: true,
+		    onSearchQuery: function(){
+		    	_this.setState({ results: _this.props.onSearchQuery() });
+		    }
+		});
+	},
+
+	getInitialState: function(){
+		return {
+			searchText: '',
+			results: [
+				{
+			      title: 'Horse',
+			      description: 'An Animal',
+			    },
+			    {
+			      title: 'Cow',
+			      description: 'Another Animal',
+			    }
+			]
+		};
+	},
+
+	render: function() {
+		return (
+			<div ref="search" className="ui category search">
+		    <div className="ui icon input">
+		      <input className="prompt" type="text" placeholder={this.props.placeholder} valueLink={this.linkState('searchText')}/>
+		      <i className="search icon"></i>
+		    </div>
+		    <div className="results"></div>
+		  </div>
+		);
+	}
+});
+
+
 
 // A bit of inspiration for this project has come from Douglas Adams' "Dirk Gently's Holistic Detective Agency", from a particular section of the novel where Richard MacDuff is discussing a program he created back in the 80s, which is a sort of spreadsheeting application that turns numerical data into music. Aside from the obvious facetiousness which follows the rest of the novel, this particular idea (which hasn't been executed to my knowledge) posseses a certain childlike naivety to it - "why not? we can see data, we can touch it, why can't we hear it".
 // And so, why not?

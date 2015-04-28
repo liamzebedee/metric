@@ -1,4 +1,13 @@
-// Category = { path: ["Top Level Cat", "Second Level Cat"] }
+/* 
+Category = {
+	path: ["Top Level Cat", "Second Level Cat"],
+	schema: [
+		"field name/label": { value: "default value" },
+		"another field": { value: 12, inc: 1, max: 20, min: 10 },
+		"a date field": { value: new Date(), optional: true }
+	]
+}
+*/
 Categories = new Mongo.Collection("categories");
 Categories.addCategory = function(fullCategoryPath) {
 	category = {
@@ -77,19 +86,6 @@ Records.addRecord = function(category, timestamp, data) {
 		data: data
 	};
 };
-
-/*
-	RecordSchema = {
-		categoryId: "...",
-		fields: {
-			"field name/label": { value: "default value" },
-			"another field": { value: 12, inc: 1, max: 20, min: 10 },
-			"a date field": { value: new Date(), optional: true }
-		}
-	}
-*/
-RecordSchemas = new Mongo.Collection("record-schemas");
-
 
 /*
 
