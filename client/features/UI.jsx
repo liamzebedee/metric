@@ -215,33 +215,37 @@ AddRecord = ReactMeteor.createClass({
 
 			recordCategory: {
 				isNew: true,
-				categoryText: "",
-				fields: {
-					"String": {
+				categoryResults: [],
+
+				defaultFields: {
+					"string": {
 						value: ""
 					},
-					"Number": {
+					"number": {
 						value: 6.5,
 						step: 0.5,
 						min: 2,
 						max: 30
 					},
-					"DateTime": {
+					"Date": {
 						value: new Date()
 					},
-					"Boolean": {
+					"boolean": {
 						value: true
 					}
-				}
+				},
+
+				categoryText: "",
+				fields: {}
 			}
 
 	    };
 	    return state;
 	  },
 
-	 clearForm: function() {
-	 	this.replaceState(this.getInitialState());
-	 },
+	clearForm: function() {
+		this.replaceState(this.getInitialState());
+	},
 
 	submitForm: function() {
 		this.clearForm();
@@ -255,21 +259,36 @@ AddRecord = ReactMeteor.createClass({
 		var results = [];
 		
 		var categoriesCursor = Categories.find({
-			path: new RegExp(this.state.recordCategory.categoryText)
+			path: new RegExp('^'+this.state.recordCategory.categoryText)
 		}, {});
 		var num = categoriesCursor.count();
 
 		if(num == 0) {
 			this.state.recordCategory.isNew = true;
-			console.log('new');
-
 		} else if(num > 0) {
 			// found some potential categories
 			results = categoriesCursor.fetch();
-			console.log(results);
 		}
 
-		return results;
+		var resultsOnlyText = [];
+		results.forEach(function(cat){
+			resultsOnlyText.push(cat.path.join('/'));
+		});
+		this.refs.search.props.options = resultsOnlyText;
+		//this.setState({ recordCategory: { categoryResults: results } });
+	},
+
+	addField: function() {
+		var fields = this.state.recordCategory.fields;
+		var i = Object.keys(fields).length + 1;
+		fields["New field #"+i] = { value: 42 }; // TODO set default as above
+		this.setState({ recordCategory: $.extend(this.state.recordCategory, {fields: fields}) });
+	},
+
+	changeFieldType: function(fieldName, newType) {
+		var fields = this.state.recordCategory.fields;
+		fields[fieldName] = this.state.recordCategory.defaultFields[newType];
+		this.setState({ recordCategory: $.extend(this.state.recordCategory, {fields: fields}) });
 	},
 
 	render: function() {
@@ -277,7 +296,8 @@ AddRecord = ReactMeteor.createClass({
 		for(fieldName in this.state.recordCategory.fields) {
 			var field = this.state.recordCategory.fields[fieldName];
 			var fieldView = null;
-			switch(Util.getObjectType(field.value)) {
+			var fieldType = Util.getObjectType(field.value);
+			switch(fieldType) {
 				case 'string':
 					fieldView = (<UI.JSONString name={fieldName} value={field.value}/>);
 					break;
@@ -296,7 +316,8 @@ AddRecord = ReactMeteor.createClass({
 
 			var typeCol, controlsCol;
 			if(this.state.editingSchema) { 
-				typeCol = <td><AddRecord.FieldTypeSelector /></td>;
+				var onChangeBinding = this.changeFieldType.bind(this, fieldName);
+				typeCol = <td><AddRecord.FieldTypeSelector fieldType={fieldType} key={fieldName} onFieldTypeChange={onChangeBinding}/></td>;
 				controlsCol = (
 					<td>
 						<button className="ui red icon button"><i className="minus square icon" onClick={this.deleteField}></i> Delete</button>
@@ -338,7 +359,8 @@ AddRecord = ReactMeteor.createClass({
 
 
 						      <label>Category</label>
-							  <SearchInput ref="categorySearch" placeholder="/Health/Physical/Diabetes/Blood Glucose Levels" onSearchQuery={this.searchForCategory}/>
+						      <ReactTypeahead.Typeahead className="ui search focus" ref="search" defaultValue="/Health/Physical/Diabetes/Blood Glucose Levels" customClasses={{ results: "results transition visible", input: "prompt", listItem: "result" }} onKeyDown={this.searchForCategory}/>
+
 						    </div>
 						</div>
 
@@ -347,7 +369,7 @@ AddRecord = ReactMeteor.createClass({
 			      
 					      <span className="ui buttons" style={{ display: 'inline-block', 'float': 'right', marginLeft: '1em' }}>
 							<button className="ui blue icon button" onClick={this.changeEditingSchemaStatus}><i className="edit icon"></i>{ this.state.editingSchema ? "Finish editing" : "Edit schema"}</button>
-							<button className="ui positive button"><i className="add circle icon"></i>Add new</button>
+							<button className="ui positive button" onClick={this.addField}><i className="add circle icon"></i>Add new</button>
 					      </span>
 						</header>
 
@@ -385,44 +407,88 @@ AddRecord = ReactMeteor.createClass({
 
 AddRecord.FieldTypeSelector = ReactMeteor.createClass({
 	componentDidMount: function() {
-		$(React.findDOMNode(this.refs.dropdown)).dropdown();
+		var _this = this;
+		$(React.findDOMNode(this.refs.dropdown)).dropdown({
+			onChange: _this.onChange
+		});
+		$(React.findDOMNode(this.refs.text)).html(React.renderToString(this.getViewForType(this.state.selectedType)));
+	},
+
+	onChange: function(value, text, $choice) {
+		this.setState({ selectedType: value });
+		this.props.onFieldTypeChange(this.state.selectedType);
+	},
+
+	getHumanTypeForJSType: function(jsType) {
+		// this data shouldn't be in state, but eh.
+		// TODO
+		var humanType = '';
+		this.state.types.forEach(function(type){
+			if(type.jsType === jsType) {
+				humanType = type.name;
+				return;
+			}
+		});
+		return humanType;
+	},
+
+	getViewForType: function(jsType) {
+		var view = '';
+		this.state.types.forEach(function(type){
+			if(type.jsType === jsType) {
+				view = type.view;
+				return;
+			}
+		});
+		return view;
 	},
 
 	getInitialState: function() {
 		var state = {
-			selectedType: '',
+			selectedType: this.props.fieldType,
 			types: [
 				{
 					name: 'Number',
-					icon: 'calculator'
+					icon: 'calculator',
+					jsType: 'number'
 				},
 				{
 					name: 'Dates and times',
-					icon: 'calendar'
+					icon: 'calendar',
+					jsType: 'Date'
 				},
 				{
 					name: 'Text',
-					icon: 'font'
+					icon: 'font',
+					jsType: 'string'
 				},
 				{
 					name: 'Checkbox',
-					icon: 'toggle off'
+					icon: 'toggle off',
+					jsType: 'boolean'
 				}
 			]
 		};
+
+		// add views
+		state.types.forEach(function(type) {
+			type.view = (<div className="item" key={type.jsType} data-value={type.jsType}><i className={"icon "+type.icon}></i>{type.name}</div>);
+		});
+
+
 		return state;
 	},
 
 	render: function() {
+		// fieldType={fieldType} onFieldTypeChange={this.changeFieldType}
 		var typesView = [];
-		this.state.types.forEach(function(type) {
-			typesView.push(<div className="item" key={type.name}><i className={"icon "+type.icon}></i>{type.name}</div>);
-		});
+		this.state.types.forEach(function(type){ typesView.push(type.view); })
 
 		return (
 		<div className="ui fluid search selection dropdown" ref="dropdown">
 		  <i className="dropdown icon"></i>
-		  <div className="default text">Select Country</div>
+		  <div className="text" ref="text"></div>
+		  
 		  <div className="menu">
 		  	{typesView}
 		  </div>
@@ -578,7 +644,9 @@ UI.JSEditor = ReactMeteor.createClass({
 SearchInput = ReactMeteor.createClass({
 	mixins: [React.addons.LinkedStateMixin],
 
+
 	componentDidMount: function(){
+
 		var _this = this;
 		$(React.findDOMNode(this.refs.search)).search({
 		    source: this.state.results,
@@ -588,6 +656,7 @@ SearchInput = ReactMeteor.createClass({
 		    searchFullText: true,
 		    onSearchQuery: function(){
 		    	_this.setState({ results: _this.props.onSearchQuery() });
+
 		    }
 		});
 	},
