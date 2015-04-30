@@ -100,8 +100,6 @@ return average(Records.get('/Health/Body/Exercise/').since('two weeks ago'))
 
 
 
-
-
 // http://estools.github.io/esquery/
 // http://esprima.org/doc/index.html
 // http://pegjs.org/

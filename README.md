@@ -40,6 +40,7 @@ While developing any project, I always have too many ideas and never end up buil
  - natural language search interface
  - reactive visualisation of metric inputs à la LightTable
  - rewritten as a Node app so we can use NPM (fucking Meteor package management eugh)
+ - SQL query interface for record overview
 
 ## Thanks
 This uses these projects:
