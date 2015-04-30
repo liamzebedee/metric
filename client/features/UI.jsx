@@ -137,7 +137,7 @@ AddMetric = ReactMeteor.createClass({
 
 	getInitialState: function() {
 		var state = {
-			resetKey: 0+new Date(), // oh I'm naughty
+			resetKey: (+new Date()), // oh I'm naughty
 
 	    	name: "",
 	    	category: "",
@@ -155,6 +155,10 @@ AddMetric = ReactMeteor.createClass({
 	 clearForm: function() {
 	 	this.replaceState(this.getInitialState());
 	 },
+
+	changeCategory: function(category) {
+		this.setState({ categoryText: category });
+	}, 
 
 	 submitForm: function() {
 	 	Metrics.addMetric(this.state.name, this.state.category, this.state.computeFunctionString);
@@ -184,10 +188,7 @@ AddMetric = ReactMeteor.createClass({
 						    </div>
 						    <div className="required field">
 						      <label>Category</label>
-						      <div className="ui icon input">
-						        <input type="text" placeholder="/Health/Physical" valueLink={this.linkState('category')}/>
-						        <i className="search link icon"></i>
-						      </div>
+						      <UI.CategorySearchInput onNewSearchOrCategory={this.changeCategory}/>
 						    </div>
 						</div>
 
@@ -209,35 +210,31 @@ AddRecord = ReactMeteor.createClass({
 
 	getInitialState: function() {
 		var state = {
-			resetKey: 0+new Date(), // oh I'm naughty
+			resetKey: (+new Date()), // oh I'm naughty
 
 			editingSchema: false,
 
-			recordCategory: {
-				isNew: true,
-				categoryResults: [],
+			categoryText: "",
 
-				defaultFields: {
-					"string": {
-						value: ""
-					},
-					"number": {
-						value: 6.5,
-						step: 0.5,
-						min: 2,
-						max: 30
-					},
-					"Date": {
-						value: new Date()
-					},
-					"boolean": {
-						value: true
-					}
+			defaultFields: {
+				"string": {
+					value: ""
 				},
+				"number": {
+					value: 6.5,
+					step: 0.5,
+					min: 2,
+					max: 30
+				},
+				"Date": {
+					value: new Date()
+				},
+				"boolean": {
+					value: true
+				}
+			},
 
-				categoryText: "",
-				fields: {}
-			}
+			fields: []
 
 	    };
 	    return state;
@@ -255,46 +252,43 @@ AddRecord = ReactMeteor.createClass({
 		this.setState({ editingSchema: !this.state.editingSchema });
 	},
 
-	searchForCategory: function() {
-		var results = [];
-		
-		var categoriesCursor = Categories.find({
-			path: new RegExp('^'+this.state.recordCategory.categoryText)
-		}, {});
-		var num = categoriesCursor.count();
-
-		if(num == 0) {
-			this.state.recordCategory.isNew = true;
-		} else if(num > 0) {
-			// found some potential categories
-			results = categoriesCursor.fetch();
-		}
-
-		var resultsOnlyText = [];
-		results.forEach(function(cat){
-			resultsOnlyText.push(cat.path.join('/'));
-		});
-		this.refs.search.props.options = resultsOnlyText;
-		//this.setState({ recordCategory: { categoryResults: results } });
-	},
-
 	addField: function() {
-		var fields = this.state.recordCategory.fields;
-		var i = Object.keys(fields).length + 1;
-		fields["New field #"+i] = { value: 42 }; // TODO set default as above
-		this.setState({ recordCategory: $.extend(this.state.recordCategory, {fields: fields}) });
+		var fields = this.state.fields;
+		var i = fields.length + 1;
+		fields.push({ fieldName: "New field #"+i, value: 42 }); // TODO set default as above
+		this.setState({fields: fields});
 	},
 
 	changeFieldType: function(fieldName, newType) {
-		var fields = this.state.recordCategory.fields;
-		fields[fieldName] = this.state.recordCategory.defaultFields[newType];
-		this.setState({ recordCategory: $.extend(this.state.recordCategory, {fields: fields}) });
+		var fields = this.state.fields;
+		for (var i = 0, field; field = this.state.fields[i]; i++) {
+			if(field.fieldName == fieldName) {
+				field.value = this.state.defaultFields[newType].value;
+			}
+		};
+		this.setState({fields: fields});
+	},
+
+	changeCategory: function(category) {
+		this.setState({ categoryText: category });
+	},
+
+	renameField: function(fieldName, event) {
+		var newFieldName = event.target.value;
+		var fields = this.state.fields;
+		fields.forEach(function(field){
+			if(field.fieldName == fieldName) {
+				field.fieldName = newFieldName;
+			}
+		});
+		this.setState({fields: fields});
 	},
 
 	render: function() {
 		fieldsView = [];
-		for(fieldName in this.state.recordCategory.fields) {
-			var field = this.state.recordCategory.fields[fieldName];
+
+		for (var i = 0, field; field = this.state.fields[i]; i++) {
+			var fieldName = field.fieldName;
 			var fieldView = null;
 			var fieldType = Util.getObjectType(field.value);
 			switch(fieldType) {
@@ -311,13 +305,12 @@ AddRecord = ReactMeteor.createClass({
 					fieldView = (<UI.JSONDateTime name={fieldName} value={field.value}/>);
 					break;
 				default:
-					console.log("Error: field type isn't recognised "+(typeof field.value));
+					console.log("Error: field "+"'"+fieldName+"'"+" type isn't recognised "+(typeof field.value));
 			}
 
 			var typeCol, controlsCol;
-			if(this.state.editingSchema) { 
-				var onChangeBinding = this.changeFieldType.bind(this, fieldName);
-				typeCol = <td><AddRecord.FieldTypeSelector fieldType={fieldType} key={fieldName} onFieldTypeChange={onChangeBinding}/></td>;
+			if(this.state.editingSchema) {
+				typeCol = <td><AddRecord.FieldTypeSelector fieldType={fieldType} onFieldTypeChange={this.changeFieldType.bind(this, fieldName)}/></td>;
 				controlsCol = (
 					<td>
 						<button className="ui red icon button"><i className="minus square icon" onClick={this.deleteField}></i> Delete</button>
@@ -325,9 +318,18 @@ AddRecord = ReactMeteor.createClass({
 					</td>
 				);
 			}
+
+			var fieldNameView;
+
+			if(this.state.editingSchema) {
+				fieldNameView = (<input type="text" defaultValue={fieldName} onChange={this.renameField.bind(this, fieldName)}/>);
+			} else {
+				fieldNameView = (<span>{fieldName}</span>);
+			}
+
 			fieldsView.push((
-			    <tr className="" key={fieldName}>
-			      <td>{fieldName}</td>
+			    <tr className="" key={i}>
+			      <td>{fieldNameView}</td>
 			      <td>{fieldView}</td>
 			      {typeCol}
 			      {controlsCol}
@@ -356,11 +358,8 @@ AddRecord = ReactMeteor.createClass({
 					<div className="ui form">
 						<div className="one field">
 						    <div className="required field">
-
-
 						      <label>Category</label>
-						      <ReactTypeahead.Typeahead className="ui search focus" ref="search" defaultValue="/Health/Physical/Diabetes/Blood Glucose Levels" customClasses={{ results: "results transition visible", input: "prompt", listItem: "result" }} onKeyDown={this.searchForCategory}/>
-
+						      <UI.CategorySearchInput onNewSearchOrCategory={this.changeCategory}/>
 						    </div>
 						</div>
 
@@ -498,6 +497,8 @@ AddRecord.FieldTypeSelector = ReactMeteor.createClass({
 });
 
 UI.JSONDateTime = ReactMeteor.createClass({
+	mixins: [React.addons.LinkedStateMixin],
+
 	getInitialState: function() {
 		return { value: this.props.value, name: this.props.name, isRequired: true };
 	},
@@ -507,7 +508,7 @@ UI.JSONDateTime = ReactMeteor.createClass({
 			<div className={Util.classNames("inline field", {"required": this.state.isRequired}) }>
 		      
 		      <div className="ui input">
-		        <input type="datetime"/>
+		        <input type="datetime" valueLink={this.linkState('value')}/>
 		      </div>
 		    </div>
 		);
@@ -515,21 +516,23 @@ UI.JSONDateTime = ReactMeteor.createClass({
 });
 
 UI.JSONNumber = ReactMeteor.createClass({
+	mixins: [React.addons.LinkedStateMixin],
+
 	getInitialState: function() {
-		return { value: this.props.value, name: this.props.name, isRequired: true };
+		return { fieldValue: this.props.value, name: this.props.name, isRequired: true };
 	},
 
 	render: function() {
 		return (
 		<div className={Util.classNames("inline field", {"required": this.state.isRequired}) }>
-		      
 		      <div className="ui input">
-		        <input type="number" min={this.props.min} max={this.props.max} step={this.props.step}/>
+		        <input type="number" min={this.props.min} max={this.props.max} step={this.props.step} valueLink={this.linkState('fieldValue')} />
 		      </div>
 		    </div>
 			);
 	}
 });
+
 UI.JSONString = ReactMeteor.createClass({
 	mixins: [React.addons.LinkedStateMixin],
 
@@ -540,12 +543,15 @@ UI.JSONString = ReactMeteor.createClass({
 	render: function() {
 		return (
 		<div className={Util.classNames("inline field", {"required": this.state.isRequired}) }>
-		        <textarea className="expandable" style={{ height: '3em', minHeight: '3em'}} valueLink={this.linkState('value')} rows="1"></textarea>
+		        <textarea className="expandable" style={{ height: '3em', minHeight: '3em'}} valueLink={this.linkState('value')} rows="1" />
 		    </div>
 			);
 	}
 });
+
 UI.JSONBoolean = ReactMeteor.createClass({
+	mixins: [React.addons.LinkedStateMixin],
+
 	getInitialState: function() {
 		return { value: this.props.value, name: this.props.name, isRequired: true };
 	},
@@ -558,10 +564,9 @@ UI.JSONBoolean = ReactMeteor.createClass({
 		return (
 			<div className={Util.classNames("inline field", {"required": this.state.isRequired}) }>
 					    <div className="ui toggle checkbox" ref="checkbox">
-					      <input type="radio" />
-					      
-					    </div>
-					  	</div>
+					      <input type="checkbox" valueLink={this.linkState('value')}/>		   
+				</div>
+			</div>
 			);
 	}
 });
@@ -664,16 +669,7 @@ SearchInput = ReactMeteor.createClass({
 	getInitialState: function(){
 		return {
 			searchText: '',
-			results: [
-				{
-			      title: 'Horse',
-			      description: 'An Animal',
-			    },
-			    {
-			      title: 'Cow',
-			      description: 'Another Animal',
-			    }
-			]
+			results: []
 		};
 	},
 
@@ -686,6 +682,44 @@ SearchInput = ReactMeteor.createClass({
 		    </div>
 		    <div className="results"></div>
 		  </div>
+		);
+	}
+});
+
+
+UI.CategorySearchInput = ReactMeteor.createClass({
+	getInitialState: function() {
+		return { options: [] };
+	},
+
+	onKeyDown: function(event) {
+		var searchText = event.target.value;// TODO not proper react, DOM is not source of truth
+		this.searchForCategory(searchText);
+	},
+
+	selectCategory: function(category) {
+		this.props.onNewSearchOrCategory(category);
+	},
+
+	searchForCategory: function(searchText) {
+		var categoriesCursor = Categories.find({
+			path: new RegExp('^'+searchText)
+		}, {});
+		var num = categoriesCursor.count();
+
+		var results = categoriesCursor.fetch() || [];
+
+		var resultsOnlyText = [];
+		results.forEach(function(cat){
+			resultsOnlyText.push(cat.path.join('/'));
+		});
+
+		this.setState({ options: resultsOnlyText });
+	},
+
+	render: function() {
+		return (
+			<ReactTypeahead.Typeahead ref="typeahead" className="ui search focus" placeholder="/Health/Physical/Diabetes/Blood Glucose Levels" customClasses={{ results: "results transition visible", input: "prompt", listItem: "result" }} onKeyDown={this.onKeyDown} onOptionSelected={this.selectCategory} options={this.state.options}/>
 		);
 	}
 });
