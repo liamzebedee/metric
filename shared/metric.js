@@ -2,9 +2,9 @@
 Category = {
 	path: ["Top Level Cat", "Second Level Cat"],
 	schema: [
-		"field name/label": { value: "default value" },
-		"another field": { value: 12, inc: 1, max: 20, min: 10 },
-		"a date field": { value: new Date(), optional: true }
+		{ fieldName: "field name/label", value: "default value" },
+		{ fieldName: "field name/label", value: "default value" },
+		{ fieldName: "field name/label", value: "default value" },
 	]
 }
 */
@@ -13,6 +13,15 @@ Categories.addCategory = function(fullCategoryPath) {
 	category = {
 		path: '' // unqiue key
 	};
+};
+Categories.setSchema = function(categoryId, schema) {
+	Categories.update({
+		_id: categoryId
+	}, {
+		$set: {
+			schema: schema
+		}
+	});
 };
 Categories.findOrCreateByCategoryPath = function(categoryPath) {
 	// categoryPath - "/Category1/Category2"
@@ -25,10 +34,11 @@ Categories.findOrCreateByCategoryPath = function(categoryPath) {
 	// stupid Meteor docs, it actually returns undefined, not null
 	if(category == null) {
 		categoryId = Categories.insert({
-			path: categoryPath
+			path: categoryPath,
+			schema: []
 		});
 	} else {
-		categoryId = categoryId._id;
+		categoryId = category._id;
 	}
 
 	return categoryId;
@@ -79,12 +89,21 @@ When to (re)compute a metric:
 // Record = { timestamp: 12312321, category: "...", fields: {} }
 Records = new Mongo.Collection("records");
 
-Records.addRecord = function(category, timestamp, data) {
+Records.addRecord = function(categoryPath, timestamp, data) {
 	var record = {
-		timestamp: 12321,
-		category: Categories.findOrCreateByCategoryPath(fullCategoryPathString),
-		data: data
+		timestamp: +new Date(),
+		category: Categories.findOrCreateByCategoryPath(categoryPath),
+		fields: {}
 	};
+
+
+	console.log(record.fields);
+	console.log(schema);
+
+	// update fields
+	Records.insert(record);
+	// update schema
+
 };
 
 /*

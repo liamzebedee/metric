@@ -5,6 +5,7 @@ TODO before v1.0.0
 
 ## Add record
  - successfully add record into DB
+ - fix valueLink
  - show records in table
 
 ## Add metric
@@ -22,12 +23,12 @@ TODO before v1.0.0
 
 ## Home
  - show a nice pretty dashboard with metrics and records shown (http://liamz.tumblr.com/image/116297049576)
- - implement natural language search menu on header
 
 
 "Beta"
 ======
 
+ - implement natural language search menu on header
  - import/export data
  - graphing and visualisation
  - move to nodejs w/ socket.io

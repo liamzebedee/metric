@@ -241,10 +241,28 @@ AddRecord = ReactMeteor.createClass({
 	  },
 
 	clearForm: function() {
+		// don't reset category text
+		var categoryText = this.state.categoryText;
 		this.replaceState(this.getInitialState());
+		this.setState({ categoryText: categoryText });
 	},
 
 	submitForm: function() {
+		var copyOfStateFields = JSON.parse(JSON.stringify(this.state.fields)); // clone
+		var fields = {};
+		var schema = [];
+
+		// separate fields from schema data
+		for (var i = 0, field; field = copyOfStateFields[i]; i++) {
+			var name = field.fieldName;
+			delete field.fieldName;
+			fields[name] = field;
+
+			
+		}
+
+		Records.addRecord(this.state.categoryText, null, fields);
+
 		this.clearForm();
 	},
 
@@ -255,7 +273,7 @@ AddRecord = ReactMeteor.createClass({
 	addField: function() {
 		var fields = this.state.fields;
 		var i = fields.length + 1;
-		fields.push({ fieldName: "New field #"+i, value: 42 }); // TODO set default as above
+		fields.push($.extend({ fieldName: "New field #"+i }, this.state.defaultFields["number"]));
 		this.setState({fields: fields});
 	},
 
@@ -263,7 +281,7 @@ AddRecord = ReactMeteor.createClass({
 		var fields = this.state.fields;
 		for (var i = 0, field; field = this.state.fields[i]; i++) {
 			if(field.fieldName == fieldName) {
-				field.value = this.state.defaultFields[newType].value;
+				this.state.fields[i] = $.extend(this.state.defaultFields[newType], { fieldName: fieldName });
 			}
 		};
 		this.setState({fields: fields});
@@ -343,6 +361,10 @@ AddRecord = ReactMeteor.createClass({
 			editingControlsHeader = <th>Controls</th>;
 		}
 
+		var noValidationErrors = 
+				this.state.fields.length > 0
+			&&	this.state.categoryText != "";
+
 		return (
 			<div style={{ padding: '1em 1em'}}>
 				<div className="ui segment" key={this.state.resetKey} >
@@ -352,7 +374,7 @@ AddRecord = ReactMeteor.createClass({
 			      <span className="ui big buttons" style={{ display: 'inline-block', 'float': 'right' }}>
 			        <button className="ui button" onClick={this.clearForm}><i className="remove icon"></i>Clear</button>
 			        <div className="or"></div>
-			        <button className={ Util.classNames("ui positive button", { 'disabled': !this.state.computeFunctionValid }) } onClick={this.submitForm}><i className="add circle icon"></i>Submit</button>
+			        <button className={ Util.classNames("ui positive button", { 'disabled': !noValidationErrors }) } onClick={this.submitForm}><i className="add circle icon"></i>Submit</button>
 			      </span>
 
 					<div className="ui form">
@@ -387,7 +409,7 @@ AddRecord = ReactMeteor.createClass({
 						<br/><br/>
 						
 
-						<button>Add field</button>
+						<button onClick={this.submitForm}>Add field</button>
 					</div>
 	  			</div>
   			</div>
