@@ -14,17 +14,16 @@ Categories.addCategory = function(fullCategoryPath) {
 		path: '' // unqiue key
 	};
 };
-Categories.setSchema = function(categoryId, schema) {
+Categories.setSchema = function(categoryPath, schema) {
 	Categories.update({
-		_id: categoryId
+		_id: Categories.findOrCreateByCategoryPath(categoryPath)
 	}, {
 		$set: {
 			schema: schema
 		}
-	});
+	}, { upsert: true });
 };
 Categories.findOrCreateByCategoryPath = function(categoryPath) {
-	// categoryPath - "/Category1/Category2"
 	categoryPath = categoryPath.split('/').filter(function(e){if(e !== "") return true});
 
 	var category = Categories.findOne({
@@ -89,21 +88,14 @@ When to (re)compute a metric:
 // Record = { timestamp: 12312321, category: "...", fields: {} }
 Records = new Mongo.Collection("records");
 
-Records.addRecord = function(categoryPath, timestamp, data) {
+Records.addRecord = function(categoryPath, timestamp, fields) {
 	var record = {
 		timestamp: +new Date(),
 		category: Categories.findOrCreateByCategoryPath(categoryPath),
-		fields: {}
+		fields: fields
 	};
 
-
-	console.log(record.fields);
-	console.log(schema);
-
-	// update fields
 	Records.insert(record);
-	// update schema
-
 };
 
 /*
@@ -122,6 +114,3 @@ return average(Records.get('/Health/Body/Exercise/').since('two weeks ago'))
 // http://estools.github.io/esquery/
 // http://esprima.org/doc/index.html
 // http://pegjs.org/
-
-Meteor.startup(function () {
-});

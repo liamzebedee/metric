@@ -34,6 +34,7 @@ I admit this project does not adhere to several development practices -- the rea
 ## Ideas
 While developing any project, I always have too many ideas and never end up building it. So in the spirit of MVP, here's a dream list of features:
  - hotkey nav for menu
+ - markdown rendering for text inputs in records, and a basic editor too
  - data visualisation using d3/graph.js
  - editable HTML React-based view for metrics
  - install NPM packages

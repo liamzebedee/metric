@@ -4,8 +4,6 @@ TODO before v1.0.0
 **Get this sorted** so I can start using it in daily life for goals and tracking.
 
 ## Add record
- - successfully add record into DB
- - fix valueLink
  - show records in table
 
 ## Add metric
