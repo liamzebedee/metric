@@ -1,3 +1,4 @@
+
 /* 
 Category = {
 	path: ["Top Level Cat", "Second Level Cat"],
@@ -85,6 +86,16 @@ When to (re)compute a metric:
  - when a metric/recordcategory changes that this metric depends on 
 */
 
+function onComputeFunctionChange(){
+	listeners = [];
+
+	// analyse references to Metrics("") and Records("")
+}
+
+// watch thisMetric.computeFunction
+// watch thisMetric.dependencies.Metrics.comptueValue
+// watch thisMetric.dependencies.Records.category
+
 // Record = { timestamp: 12312321, category: "...", fields: {} }
 Records = new Mongo.Collection("records");
 
@@ -108,9 +119,3 @@ And DiabetesMetric
 
 return average(Records.get('/Health/Body/Exercise/').since('two weeks ago'))
 */
-
-
-
-// http://estools.github.io/esquery/
-// http://esprima.org/doc/index.html
-// http://pegjs.org/

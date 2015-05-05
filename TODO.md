@@ -3,11 +3,12 @@ TODO before v1.0.0
 
 **Get this sorted** so I can start using it in daily life for goals and tracking.
 
+
+
 ## Add record
  - show records in table
 
 ## Add metric
- - successfully add metric into DB
  - have metric automatically computed when added
  - show result on show metric page
  - have the metric result reactively update (make the cursor a reactive data source) - e.g. https://scotch.io/tutorials/build-a-real-time-twitter-stream-with-node-and-react-js with componentDidMount
