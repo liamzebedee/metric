@@ -10,6 +10,6 @@ Npm.depends({
 });
 
 Package.on_use(function (api) {
-  api.add_files("stuff.js", ["client", "server"]);
+  api.add_files("stuff.js", ["server"]);
   api.export('ComputeFunctionAnalyser');
 });

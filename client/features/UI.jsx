@@ -141,9 +141,8 @@ AddMetric = ReactMeteor.createClass({
 
 	    	name: "",
 	    	categoryText: "",
-	    	computeFunctionString: "// use metric.Metrics and metric.Records as inputs\n\
-// metric.computeResult is your output\n\
-'use strict';\n",
+	    	computeFunctionString: "// Metrics('/Category/Metric name')\n// Records('/Category path/goes here/').get()\n\
+// the return value is your output\n",
 	    	computeFunctionValid: true
 	    };
 	    state.jsEditor = (<UI.JSEditor 
@@ -161,7 +160,7 @@ AddMetric = ReactMeteor.createClass({
 	}, 
 
 	 submitForm: function() {
-	 	Metrics.addMetric(this.state.name, this.state.categoryText, this.state.computeFunctionString);
+	 	Meteor.call('upsertMetric', this.state.name, this.state.categoryText, this.state.computeFunctionString);
 	 	this.clearForm();
 	 },
 
@@ -239,7 +238,9 @@ AddRecord = ReactMeteor.createClass({
 				}
 			},
 
-			fields: []
+			fields: [
+				{ fieldName: "timestamp", value: new Date }
+			]
 
 	    };
 	    return state;
@@ -253,13 +254,18 @@ AddRecord = ReactMeteor.createClass({
 
 	clearForm: function() {
 		// don't reset category text
-		var categoryText = this.state.categoryText;
+		var categoryText = Util.clone(this.state.categoryText);
 		this.replaceState(this.getInitialState());
-		this.setState({ categoryText: categoryText });
+		this.changeCategory(categoryText);
+	},
+
+	getSchema: function() {
+		var copyOfStateFields = Util.clone(this.state.fields);
+		return copyOfStateFields;
 	},
 
 	submitForm: function() {
-		var copyOfStateFields = JSON.parse(JSON.stringify(this.state.fields)); // clone
+		var copyOfStateFields = Util.clone(this.state.fields);
 		var fields = {};
 		var schema = [];
 
@@ -271,7 +277,6 @@ AddRecord = ReactMeteor.createClass({
 			fields[name] = field.value;
 
 			// schema
-			delete field.value;
 			schema.push(field);
 		}
 
@@ -282,6 +287,9 @@ AddRecord = ReactMeteor.createClass({
 	},
 
 	changeEditingSchemaStatus: function() {
+		if(!this.state.editingSchema && this.state.categoryText != '') {
+			Categories.setSchema(this.state.categoryText, this.getSchema());
+		}
 		this.setState({ editingSchema: !this.state.editingSchema });
 	},
 
@@ -303,7 +311,10 @@ AddRecord = ReactMeteor.createClass({
 	},
 
 	changeCategory: function(category) {
-		this.setState({ categoryText: category });
+		var newState = {};
+		newState.categoryText = category;
+		newState.fields = Categories.findCategoryByPath(category).schema;
+		this.setState(newState);
 	},
 
 	renameField: function(fieldName, event) {
@@ -361,7 +372,7 @@ AddRecord = ReactMeteor.createClass({
 			}
 
 			fieldsView.push((
-			    <tr className="" key={i}>
+			    <tr key={i}>
 			      <td>{fieldNameView}</td>
 			      <td>{fieldView}</td>
 			      {typeCol}
@@ -424,7 +435,7 @@ AddRecord = ReactMeteor.createClass({
 						<br/><br/>
 						
 
-						<button onClick={this.submitForm}>Add field</button>
+						<button className="ui big green icon button" onClick={this.submitForm}><i className="add icon"></i>Add record</button>
 					</div>
 	  			</div>
   			</div>
@@ -752,7 +763,7 @@ UI.CategorySearchInput = ReactMeteor.createClass({
 	},
 
 	onKeyDown: function(event) {
-		var searchText = event.target.value;
+		var searchText = this.refs.typeahead.refs.entry.props.value;
 		this.searchForCategory(searchText);
 	},
 
@@ -761,8 +772,14 @@ UI.CategorySearchInput = ReactMeteor.createClass({
 	},
 
 	searchForCategory: function(searchText) {
+		var modifiers = 'ig';
+		var pattern = '[a-zA-Z\/ -]*';
+		var searchBits = Categories.parsePathIntoArray(searchText);
+		
 		var categoriesCursor = Categories.find({
-			path: new RegExp('^'+searchText)
+			// thanks https://regex101.com/
+			// took a while, but I got it
+			path: { $all: searchBits.map(function(v){ return new RegExp(v+pattern, modifiers) }) }
 		}, {});
 		var num = categoriesCursor.count();
 
@@ -773,7 +790,8 @@ UI.CategorySearchInput = ReactMeteor.createClass({
 			resultsOnlyText.push(cat.path.join('/'));
 		});
 
-		this.setState({ options: resultsOnlyText });
+		// this.setState({ options: resultsOnlyText });
+		this.refs.typeahead.props.options = resultsOnlyText;
 	},
 
 	addNewCategory: function() {

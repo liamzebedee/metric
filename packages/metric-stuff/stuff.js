@@ -26,8 +26,3 @@ ComputeFunctionAnalyser.getDependencies = function(computeFunctionCodeString) {
 
 	return dependencies;
 }
-
-Meteor.startup(function () {
-	// Add watches for Metric and 
-
-});

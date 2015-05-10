@@ -41,3 +41,11 @@ Util.getObjectType = function(obj) {
 	}
 	return type;
 };
+
+Util.escapeRegExp = function(str) {
+	return str.replace(/[\-\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/g, "\\$&");
+};
+
+Util.clone = function(obj) {
+	return JSON.parse( JSON.stringify(obj) );
+};

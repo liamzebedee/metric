@@ -28,6 +28,9 @@ Later when functional I'll bundle it up as an single-file app.
 ## License
 Copyright Liam Edwards-Playne 2015. Licensed under [Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International License](http://creativecommons.org/licenses/by-nc-sa/4.0/), which means you **can't use it for commercial purposes** without my written permission.
 
+## Project goals
+ - 
+
 ## Development practices
 I admit this project does not adhere to several development practices -- the reason for this is that I am trying to develop it as quickly as possible and don't have time for dealing with the inadequacies of the Meteor packaging system, among (many) other things.
 
@@ -40,8 +43,9 @@ While developing any project, I always have too many ideas and never end up buil
  - install NPM packages
  - natural language search interface
  - reactive visualisation of metric inputs à la LightTable
- - rewritten as a Node app so we can use NPM (fucking Meteor package management eugh)
  - SQL query interface for record overview
+ - integration/stealing design from [Jupyter](http://jupyter.org), [Personal API hacks](https://news.ycombinator.com/item?id=5799706)
+ - metrics retrieving data from external services (Fitbit)
 
 ## Thanks
 This uses these projects:
