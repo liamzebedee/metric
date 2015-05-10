@@ -1,3 +1,9 @@
+// Client needs this so that we can detect when the DDP (Meteor minimongo) connection has been established
+// autopackage is still included
+Meteor.publish("metrics", function () { return Metrics.find(); });
+Meteor.publish("categories", function () { return Categories.find(); });
+Meteor.publish("records", function () { return Records.find(); });
+
 Meteor.methods({
 	upsertMetric: function(name, fullCategoryPathString, computeFunctionCodeString) {
 		// todo check if computeFunction hasn't changed, and skip all this expensive stuff
@@ -37,6 +43,13 @@ Meteor.methods({
 		});
 
 		return metric_id;
+	},
+
+	recomputeMetric: function(id) {
+		var metric = Metrics.findOne(id);
+		var computeResult = Metrics.runComputeFunction(metric.compute);
+		console.log('recompute '+id+' with val: '+computeResult);
+		Metrics.update(id, { $set: { computeResult: computeResult } });
 	}
 });
 

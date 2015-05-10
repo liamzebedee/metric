@@ -1,3 +1,29 @@
+Meteor.startup(function(){
+
+RouteHandler = ReactRouter.RouteHandler;
+
+App = ReactMeteor.createClass({
+	contextTypes: {
+	    router: React.PropTypes.func.isRequired
+	},
+
+	render: function() {
+		return (
+			<div>
+				<div className="container">
+					<UI.Menu/>
+					
+					<div className="ui page ">
+					<main className="column">
+			  			<RouteHandler/>
+					</main>
+					</div>
+				</div>
+			</div>
+		);
+	}
+});
+
 DefaultRoute = ReactRouter.DefaultRoute;
 Route = ReactRouter.Route;
 
@@ -14,8 +40,10 @@ routes = (
   </Route>
 );
 
-Meteor.startup(function() {
-	ReactRouter.run(routes, function (Handler) {
-	  React.render(<Handler />, document.getElementById('root'));
-	});
+ReactRouter.run(routes, function (Handler) {
+  React.render(<Handler />, document.getElementById('root'));
+});
+
+
+
 });
