@@ -143,7 +143,9 @@ AddMetric = ReactMeteor.createClass({
 	    	categoryText: "",
 	    	computeFunctionString: "// Metrics('/Category/Metric name')\n// Records('/Category path/goes here/').get()\n\
 // the return value is your output\n",
-	    	computeFunctionValid: true
+	    	computeFunctionValid: true,
+
+	    	metricError: ""
 	    };
 	    state.jsEditor = (<UI.JSEditor 
 					    	code={state.computeFunctionString} 
@@ -160,8 +162,12 @@ AddMetric = ReactMeteor.createClass({
 	}, 
 
 	 submitForm: function() {
-	 	Meteor.call('upsertMetric', this.state.name, this.state.categoryText, this.state.computeFunctionString);
-	 	this.clearForm();
+	 	try {
+	 		Meteor.call('upsertMetric', this.state.name, this.state.categoryText, this.state.computeFunctionString);
+	 		this.clearForm();
+	 	} catch(ex) {
+	 		this.setState({metricError: ex.toString()});
+	 	}
 	 },
 
 	render: function() {
@@ -170,11 +176,21 @@ AddMetric = ReactMeteor.createClass({
 			&&	this.state.name != ""
 			&&	this.state.categoryText != "";
 
+		if(this.state.metricError) {
+			var errorbox = (<div className="ui inline nag">
+				  <span className="title">
+				  	{this.state.metricError}
+				  </span>
+				</div>);
+		}
+
 		return (
 			<div key={this.state.resetKey} style={{ padding: '1em 1em'}}>
 				<div className="ui segment">
 			      
 			     <h1 style={{ display: 'inline-block' }}>Add Metric</h1>
+
+			     {errorbox}
 			      
 			      <span className="ui big buttons" style={{ display: 'inline-block', 'float': 'right' }}>
 			        <button className="ui button" onClick={this.clearForm}><i className="remove icon"></i>Clear</button>
@@ -659,12 +675,45 @@ Dashboard = ReactMeteor.createClass({
 
 MetricOverview = ReactMeteor.createClass({
 	contextTypes: {
-    router: React.PropTypes.func.isRequired
-  },
+		router: React.PropTypes.func.isRequired
+	},
+
+	getInitialState: function() {
+		return {
+			metric: {
+				name: "",
+				computeResult: null
+			}
+		};
+	},
+
+	componentDidMount: function() {
+		this.loadMetric();
+	},
+
+	componentWillReceiveProps: function() {
+		this.loadMetric();		
+	},
+
+	loadMetric: function(){
+		var self = this;
+		Meteor.startup(function(){
+			self.setState({ metric: Metrics.findOne(self.getMetricId()) });
+		});
+	},
+
+	getMetricId: function(){ return this.context.router.getCurrentParams().id; },
+
+	recomputeMetric: function(){
+	},
 
 	render: function() {
 		return (
-			<h1>Metric Overview</h1>
+			<div>
+				<h1>Metric Overview</h1>
+				<div>{this.state.metric.name} = {this.state.metric.computeResult}</div>
+				<button onClick={this.recomputeMetric}>Recompute</button>
+			</div>
 		);
 	}
 });
@@ -700,7 +749,7 @@ UI.JSEditor = ReactMeteor.createClass({
 		editor.on('valid', function(noErrors) {
 			// BUG in jsEditor meaning that when there are no errors it returns undefined
 			// We set it to true here so it makes sense
-			if(noErrors != false) noErrors = true;
+			/*if(noErrors != false)*/ noErrors = true; // disable temp until I can customise it
 			_this.props.onValidation(editor.getValue(), noErrors);
 		});
 	},

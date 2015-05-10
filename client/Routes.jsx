@@ -8,6 +8,7 @@ routes = (
 
   	<Route name="metric-overview" path="/metrics/:id" handler={MetricOverview} />
   	<Route name="records-overview" path="/records-overview/*/" handler={RecordsOverview} />
+
   	<Route name="dashboard" path="/" handler={Dashboard} />
     <DefaultRoute handler={Dashboard} />
   </Route>

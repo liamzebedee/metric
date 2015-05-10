@@ -3,7 +3,7 @@ Meteor.methods({
 		// todo check if computeFunction hasn't changed, and skip all this expensive stuff
 
 		// locate/create category in JSON tree
-		var dependenciesText = ComputeFunctionAnalyser.getDependencies(code);
+		var dependenciesText = ComputeFunctionAnalyser.getDependencies(computeFunctionCodeString);
 		var dependencies = {
 			metrics: [],
 			records: []

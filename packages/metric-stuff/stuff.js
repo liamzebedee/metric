@@ -12,12 +12,17 @@ ComputeFunctionAnalyser.getDependencies = function(computeFunctionCodeString) {
 	};
 
 	walk(ast, function(node) {
-		if(node.type == 'CallExpression') {
-			if(node.callee.name == 'Metrics') {
+		if(node.type == 'CallExpression' && node.callee.type == "MemberExpression") {
+			var name = node.callee.object.name;
+			var prop = node.callee.property.name;
+
+			if(name == 'Metrics') {
+				// Metrics.find(category, name)
 				var dependencyString = eval(escodegen.generate(node.arguments[0]));
 				dependencies.metrics.push(dependencyString);
 
-			} else if(node.callee.name == 'Records') {
+			} else if(name == 'Records' && prop == 'find') {
+				// Records.find(category)
 				var dependencyString = eval(escodegen.generate(node.arguments[0]));
 				dependencies.records.push(dependencyString);
 			}
