@@ -64,7 +64,7 @@ AddMetric = ReactMeteor.createClass({
 		}
 
 		return (
-			<div key={this.state.resetKey} style={{ padding: '1em 1em'}}>
+			<div key={this.state.resetKey} className="niceish-padding">
 				<div className="ui segment">
 			      
 			     <h1 style={{ display: 'inline-block' }}>Add Metric</h1>

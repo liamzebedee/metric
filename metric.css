@@ -1,3 +1,16 @@
 .typeahead {
 	width: 100%;
 }
+
+.niceish-padding {
+	padding: 1em 7em;
+}
+
+#root {
+	  min-height: 100%;
+}
+
+.metric-card {
+	background: white;
+	border: 1px solid #333;
+}

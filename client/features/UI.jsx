@@ -9,6 +9,12 @@ UI = ReactMeteor.createClass({
 
 Link = ReactRouter.Link;
 
+Icon = ReactMeteor.createClass({
+	render: function() {
+		return <i className={"icon "+this.props.n}></i>;
+	}
+});
+
 UI.Menu = ReactMeteor.createClass({
 	render: function() {
 		return (
@@ -26,7 +32,7 @@ UI.Menu = ReactMeteor.createClass({
 
 
 			  <Link to="dashboard" className="item">
-				<i className="home icon"></i> Overview
+				<i className="home icon"></i> Dashboard
 			  </Link>
 			  <Link to="add-metric" className="item">
 				<i className="plus icon"></i> Add metric
@@ -53,6 +59,30 @@ UI.Segment = ReactMeteor.createClass({
 	}
 });
 
+UI.Row = ReactMeteor.createClass({
+	render: function() {
+		var cn = "ui row " + Util.classNames({'hide': this.props.hidden});
+
+		return (
+			<div className={cn}>
+				{this.props.children}
+			</div>
+		);
+	}
+});
+
+UI.Columns = ReactMeteor.createClass({
+	render: function() {
+		var cn = "columns " + Util.classNames({'hide': this.props.hidden});
+
+		return (
+			<div className={cn}>
+				{this.props.children}
+			</div>
+		);
+	}
+});
+
 UI.Record = ReactMeteor.createClass({
 	render: function() {
 		return (
@@ -71,29 +101,49 @@ UI.Record = ReactMeteor.createClass({
 });
 
 UI.Metric = ReactMeteor.createClass({
-	openEditorForComputeFunction: function() {
-
-	},
-
-	getInitialState: function() {
+	getDefaultProps: function() {
 		return {
-			computeResult: 321,
-			label: "Number of dogs"
+			computeResult: 42,
+			categoryPath: ['Path', 'to', 'Category'],
+			name: "Metric name"
 		};
 	},
 
 	render: function() {
+		var pathAsString = this.props.categoryPath.join('/');
+
+		var resultView;
+		var resultIsText = false;
+		var result = this.props.computeResult;
+		switch(Util.getObjectType(result)) {
+			case 'string':
+				resultIsText = true;
+				resultView = result;
+				break;
+			case 'number':
+				var isPercentage = result.between(0, 1, true);
+				resultView = isPercentage ?
+							(result*100).toFixed(1)+'%' :
+							result;
+				break;
+			case 'boolean':
+				resultView = result ? 'tick' : 'cross'; // TODO
+				break;
+			case 'Date':
+				resultView = result.long(); // e.g. July 22, 2012 1:55pm
+				break;
+			default:
+				resultView = result.toString();
+		}
+
 		return (
-		  <div className="metric">
-		  <div className="statistic">
-		    <div 
-		    	className={Util.classNames('value', { 'text': !Util.isNumber(this.state.computeResult) })}>
-		      {this.state.computeResult}
-		    </div>
-		    <div className="label">
-		      {this.state.label}
-		    </div>
-		  </div>
+		  <div className="metric statistic">
+			    <div className="label">
+			      <strong>{this.props.name}</strong>
+			    </div>
+			    <div className={Util.classNames('value')}>
+			      {resultView}
+			    </div>
 		  </div>
 		);
 	}

@@ -187,8 +187,8 @@ AddRecord = ReactMeteor.createClass({
 			&&	this.state.categoryText != "";
 
 		return (
-			<div style={{ padding: '1em 1em'}}>
-				<div className="ui segment" key={this.state.resetKey} >
+			<div className="niceish-padding">
+				<div className="ui segment" key={this.state.resetKey}>
 			      
 			     <h1 style={{ display: 'inline-block' }}>Add Record</h1>
 			      

@@ -3,6 +3,7 @@
 
 Not yet functional - [Progress through Tumblr screenshots](http://liamz.tumblr.com/tagged/metric)
 
+!["Dashboard" Screenshot as of 14/05/2015](https://40.media.tumblr.com/58e975c33503f957e377f38be6e16e22/tumblr_noams7yveg1trskuwo1_1280.png)
 !["Add Record" Screenshot as of 26/04/2015](https://41.media.tumblr.com/59420d6161b1690a8ca7ab15c41cd36d/tumblr_nnerknUxIb1trskuwo1_1280.png)
 !["Add Metric" Screenshot as of 26/04/2015](https://40.media.tumblr.com/dfa641e9998abb4589254ed095848cee/tumblr_nnerknUxIb1trskuwo2_1280.png)
 
@@ -17,6 +18,7 @@ Key points:
  - metrics are dynamically computed functions written in JavaScript, a record is just a JSON object
  - it's all built with web tech, it's real-time using Meteor and React
  - as a result of its client-server architecture, it can be hosted and accessed from multiple clients, and the metric computation thread is separated from the UI
+ - unlike Excel, we also can handle and do natural arithmetic on dates and hours/mins/seconds
 
 ## Install
  1. Install [Meteor](https://www.meteor.com/)
@@ -28,11 +30,9 @@ Later when functional I'll bundle it up as an single-file app.
 ## License
 Copyright Liam Edwards-Playne 2015. Licensed under [Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International License](http://creativecommons.org/licenses/by-nc-sa/4.0/), which means you **can't use it for commercial purposes** without my written permission.
 
-## Project goals
- - 
 
 ## Development practices
-I admit this project does not adhere to several development practices -- the reason for this is that I am trying to develop it as quickly as possible and don't have time for dealing with the inadequacies of the Meteor packaging system, among (many) other things.
+I admit this project does not adhere to several development practices -- the reason for this is that I am trying to develop it as quickly as possible and since I don't envision anyone else maintaining this, there's no point going the extra 20% until later. Nonetheless, I've commented all areas where things could definitely be improved.
 
 ## Ideas
 While developing any project, I always have too many ideas and never end up building it. So in the spirit of MVP, here's a dream list of features:
@@ -46,10 +46,14 @@ While developing any project, I always have too many ideas and never end up buil
  - SQL query interface for record overview
  - integration/stealing design from [Jupyter](http://jupyter.org), [Personal API hacks](https://news.ycombinator.com/item?id=5799706)
  - metrics retrieving data from external services (Fitbit)
+ - import/export data
 
 ## Thanks
 This uses these projects:
- - Meteor
- - React.js
- - classNames
- - [javascript-editor](https://github.com/maxogden/javascript-editor), and subsequently Esprima and CodeMirror
+ - [Meteor](http://meteor.com)
+ - [React.js](http://facebook.github.io/react/), React-Router
+ - [Semantic UI](http://semantic-ui.com)
+ - [classNames](https://github.com/JedWatson/classnames) by @JedWatson
+ - [javascript-editor](https://github.com/maxogden/javascript-editor) by @maxogden, and subsequently Esprima and CodeMirror
+ - [sugar.js](http://sugarjs.com/) - date parsing and such
+ - [ReactGridLayout](https://github.com/STRML/react-grid-layout) by @STRML - dashboard <3
