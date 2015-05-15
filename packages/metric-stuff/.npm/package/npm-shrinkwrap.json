@@ -50,6 +50,9 @@
     },
     "esprima-walk": {
       "version": "0.1.0"
+    },
+    "gauss": {
+      "version": "0.2.12"
     }
   }
 }

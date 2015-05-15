@@ -12,9 +12,22 @@ Dashboard = ReactMeteor.createClass({
         var ev = document.createEvent('Event');
         ev.initEvent('resize', true, true);
         window.dispatchEvent(ev);
-      },
 
-      getDefaultProps: function() {
+		Meteor.subscribe('metrics', this.metricDataReady);
+    },
+
+    metricDataReady: function() {
+    	var OPTIONS = { reactive: true };
+    	var categories = Categories.find({}, OPTIONS);
+    	categories.observe({
+    		// added: alert(1),
+    		// changed: alert(1),
+    		// removed: alert(1),
+    	});
+    	var metrics = Metrics.find({});
+    },
+
+    getDefaultProps: function() {
         return {
 	        items: 4,
 	        cols: 4,
@@ -23,8 +36,8 @@ Dashboard = ReactMeteor.createClass({
 		    rowHeight: 180,
 		    autoSize: true,
 			// margin: [0,0]
-      }
-  },
+    	}
+	},
 
 	getInitialState: function() {
 		var state = {
@@ -118,9 +131,9 @@ Dashboard = ReactMeteor.createClass({
         return layout;
       },
 
-      onLayoutChange: function(layout) {
-    this.setState({layout: layout});
-  },
+	onLayoutChange: function(layout) {
+    	this.setState({layout: layout});
+	},
 
 	render: function() {
 		var REACT_GRID_LAYOUT_MARGIN_LEFT = 10;

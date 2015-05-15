@@ -1,6 +1,6 @@
 var esprima = Npm.require('esprima');
 var escodegen = Npm.require('escodegen');
-var walk = Npm.require( 'esprima-walk' )
+var walk = Npm.require('esprima-walk');
 
 ComputeFunctionAnalyser = {};
 ComputeFunctionAnalyser.getDependencies = function(computeFunctionCodeString) {

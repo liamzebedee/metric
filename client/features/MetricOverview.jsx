@@ -19,18 +19,15 @@ MetricOverview = ReactMeteor.createClass({
 
 		// Meteor.subscribe('records');
 		// Meteor.subscribe('categories');
-		Meteor.subscribe('metrics', function(){
-			self.setState({ metric: Metrics.findOne(self.getMetricId()) });
-		});
-		this.loadMetric();
+		Meteor.subscribe('metrics', this.metricDataReady);
 	},
 
 	componentWillReceiveProps: function() {
-		this.loadMetric();
+		this.metricDataReady();
 	},
 
-	loadMetric: function(){
-		
+	metricDataReady: function(){
+		this.setState({ metric: Metrics.findOne(self.getMetricId()) });
 	},
 
 	getMetricId: function(){ return this.context.router.getCurrentParams().id; },

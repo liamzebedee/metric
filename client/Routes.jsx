@@ -1,6 +1,7 @@
 Meteor.startup(function(){
 
 RouteHandler = ReactRouter.RouteHandler;
+TransitionGroup = React.addons.CSSTransitionGroup;
 
 App = ReactMeteor.createClass({
 	contextTypes: {
@@ -8,6 +9,7 @@ App = ReactMeteor.createClass({
 	},
 
 	render: function() {
+		var name = this.context.router.getCurrentPath();
 		return (
 			<div>
 				<div className="container">
@@ -15,7 +17,9 @@ App = ReactMeteor.createClass({
 					
 					<div className="ui page ">
 					<main className="column">
-			  			<RouteHandler/>
+						{/*<TransitionGroup component="div" transitionName="pageTransition">*/}
+				          <RouteHandler key={name}/>
+				        {/*</TransitionGroup>*/}
 					</main>
 					</div>
 				</div>

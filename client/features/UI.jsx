@@ -18,17 +18,10 @@ Icon = ReactMeteor.createClass({
 UI.Menu = ReactMeteor.createClass({
 	render: function() {
 		return (
-			 <nav className="ui inverted main menu">
+			 <nav className="ui primary inverted menu">
 			  <div className="title item">
 			        <h1>{"{metric}"}</h1>
 			   </div>
-
-			   <div className="item">
-			      <div className="ui icon input">
-			        <input type="text" placeholder="Search..." style={{ width: '30em' }}/>
-			        <i className="search link icon"></i>
-			      </div>
-			    </div>
 
 
 			  <Link to="dashboard" className="item">
@@ -40,6 +33,15 @@ UI.Menu = ReactMeteor.createClass({
 			  <Link to="add-record" className="item">
 				<i className="plus icon"></i> Add record
 			  </Link>
+
+
+			   <div className="item">
+			      <div className="ui icon input">
+			        <input type="text" placeholder="Search..." style={{ width: '30em' }}/>
+			        <i className="search link icon"></i>
+			      </div>
+			    </div>
+
 			  
 			</nav>
 		);
@@ -282,7 +284,6 @@ UI.JSEditor = ReactMeteor.createClass({
 		return (
 			<div id='code-editor' className="ui container">
 		    <div className='left'></div>
-		    <div className='right'></div>
 		  </div>
 	  );
 	}

@@ -66,3 +66,62 @@ Metrics.after.update(function(userId, doc, fieldNames, modifier, options){
 Categories.after.update(function(userId, doc, fieldNames, modifier, options){
 	
 });
+
+
+
+
+// This is what the compute function gets as parameters
+var metricApi = {};
+
+metricApi.Metrics = {
+	get: function(path) {
+		return Metrics.findMetricByPath(path);
+	}
+};
+
+metricApi.Records = {
+	query: {
+		categoryId: null
+		// timestamp
+	},
+
+	find: function(path) {
+		this.categoryId = Categories.findCategoryByPath(path);
+		return this;
+	},
+
+	since: function(sinceStr) {
+		var date = Date.create(since);
+		this.query.timestamp = { $gte : date };
+		return this;
+	},
+
+	get: function() {
+		return Records.find(this.query).fetch();
+	}
+};
+
+metricApi.Vector = ComputeFunctionHelpers.gauss.Vector;
+metricApi.Collection = ComputeFunctionHelpers.gauss.Collection;
+
+Metrics.runComputeFunction = function(computeFunctionCodeString) {
+	var func = Function(
+		'Metrics', 
+		'Records', 
+		computeFunctionCodeString);
+	var result = func(
+		metricApi.Metrics,
+		metricApi.Records);
+	return result;
+}
+
+
+/*
+In the end I want to write the HealthMetric like this:
+
+return average(Metrics('/Health/DiabetesMetric').computeValue, Metrics.get('/Health/Body/ExerciseMetric'));
+
+And DiabetesMetric
+
+return average(Records('/Health/Body/Exercise/').since('two weeks ago').get())
+*/

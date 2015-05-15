@@ -3,19 +3,19 @@ TODO before v1.0.0
 
 **Get this sorted** so I can start using it in daily life for goals and tracking.
 
+## Home
+ - get reactive data source of metrics working
+ - react and layout the dashboard according to DB data
+
 ## Add record
  - show records in table
 
-## Add metric
- - have the metric result reactively update (make the cursor a reactive data source) - e.g. https://scotch.io/tutorials/build-a-real-time-twitter-stream-with-node-and-react-js with componentDidMount
-
 ## Add Metric
- - then a metric subscribes to changes and recomputes when they happen.
- - add the nice DSL for averaging and such
+ - make metric subscribe to changes and recompute when they happen
+ - finish integrating DSL into metric JS
 
-## Home
- - show a nice pretty dashboard with metrics and records shown (http://liamz.tumblr.com/image/116297049576)
-
+## Finally
+ - do these [minor tasks](https://github.com/liamzebedee/metric/milestones/v1.0.0%20%22ALPHA%22) 
 
 "Beta"
 ======

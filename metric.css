@@ -14,3 +14,22 @@
 	background: white;
 	border: 1px solid #333;
 }
+
+
+/* Transitions */
+.pageTransition-enter {
+  opacity: 0.01;
+  transition: opacity .350s ease-in;
+}
+
+.pageTransition-enter.pageTransition-enter-active {
+  opacity: 1;
+}
+
+.pageTransition-leave {
+	opacity: 0
+}
+
+.pageTransition-leave.pageTransition-leave-active {
+  opacity: 0;
+}
