@@ -27,6 +27,7 @@ MetricOverview = ReactMeteor.createClass({
 	},
 
 	metricDataReady: function(){
+		var self = this;
 		this.setState({ metric: Metrics.findOne(self.getMetricId()) });
 	},
 

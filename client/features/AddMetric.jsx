@@ -95,7 +95,7 @@ AddMetric = ReactMeteor.createClass({
 					
 	  			</div>
 
-	  			<h3 className="ui dividing header">Compute</h3>
+	  			<h3 className="ui dividing header">Compute function</h3>
 	  			<a href="https://github.com/liamzebedee/metric/wiki/Writing-a-metric" target="_blank"><Icon n="info circle"/> Docs</a>
 
 				{this.state.jsEditor}

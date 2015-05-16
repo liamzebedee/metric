@@ -2,6 +2,8 @@ Meteor.startup(function(){
 
 
 Dashboard = ReactMeteor.createClass({
+	REACT_GRID_LAYOUT_MARGIN_LEFT: 10,
+
     mixins: [React.PureRenderMixin],
 
 	contextTypes: {
@@ -12,68 +14,63 @@ Dashboard = ReactMeteor.createClass({
         var ev = document.createEvent('Event');
         ev.initEvent('resize', true, true);
         window.dispatchEvent(ev);
-
-		Meteor.subscribe('metrics', this.metricDataReady);
     },
 
-    metricDataReady: function() {
-    	var OPTIONS = { reactive: true };
-    	var categories = Categories.find({}, OPTIONS);
-    	categories.observe({
-    		// added: alert(1),
-    		// changed: alert(1),
-    		// removed: alert(1),
-    	});
-    	var metrics = Metrics.find({});
-    },
+    startMeteorSubscriptions: function() {
+		Meteor.subscribe("metrics");
+		Meteor.subscribe("categories");
+	},
 
-    getDefaultProps: function() {
-        return {
-	        items: 4,
-	        cols: 4,
-		    isResizable: true,
-		    isDraggable: false,
-		    rowHeight: 180,
-		    autoSize: true,
-			// margin: [0,0]
-    	}
+	getMeteorState: function() {
+		var meteorState = {
+			categories2: []
+		};
+		var categories = Categories.find().fetch();
+		categories.forEach(function(category){
+			cat = {
+				path: category.path,
+				metrics: []
+			};
+			cat.metrics = Metrics.find({ categoryId: category._id }).fetch();
+			meteorState.categories2.push(cat);
+		});
+		return meteorState;
 	},
 
 	getInitialState: function() {
 		var state = {
 			// TODO dummy data
-			// get reactive cursor from DB
 			categories: [
 				{
 					path: ["Life"],
 					metrics: [
-						{ name: "Satisfaction", value: 80 }
+						{ name: "Satisfaction", computeValue: 80 }
 					]
 				},
 				{
 					path: ["Life", "Health"],
 					metrics: [
-						{ name: "Diabetes", value: 10.3 },
-						{ name: "Sleep", value: 8 },
-						{ name: "Exercise", value: 0.86 }
+						{ name: "Diabetes", computeValue: 10.3 },
+						{ name: "Sleep", computeValue: 8 },
+						{ name: "Exercise", computeValue: 0.86 }
 					]
 				},
 				{
 					path: ["Life", "Social"],
 					metrics: [
-						{ name: "Communications", value: 0.509 },
-						{ name: "Family", value: true },
-						{ name: "Friends", value: true },
-						{ name: "Romance", value: true }
+						{ name: "Communications", computeValue: 0.509 },
+						{ name: "Family", computeValue: true },
+						{ name: "Friends", computeValue: true },
+						{ name: "Romance", computeValue: true }
 					]
 				},
 				{
 					path: ["Life", "Me"],
 					metrics: [
-						{ name: "Commitment", value: 0.85 },
-						{ name: "Self-esteem/image", value: 0.79 },
-						{ name: "Opportunities", value: 13 },
-						{ name: "Risk-taking", value: "More!" }
+						{ name: "Commitment", computeValue: 0.85 },
+						{ name: "Self-esteem/image", computeValue: 0.79 },
+						{ name: "Opportunities", computeValue: 13 },
+						{ name: "Risk-taking", computeValue: "More!" }
 					]
 				}
 			]
@@ -90,7 +87,7 @@ Dashboard = ReactMeteor.createClass({
 			category.metrics.forEach(function(metric, i){
 				metricsView.push(
 					<div key={i} className="column">
-						<UI.Metric name={metric.name} categoryPath={category.path} computeResult={metric.value}/>
+						<UI.Metric name={metric.name} categoryPath={category.path} computeResult={metric.computeValue}/>
 					</div>
 				);
 			});
@@ -129,23 +126,32 @@ Dashboard = ReactMeteor.createClass({
 		});
 
         return layout;
-      },
+    },
 
 	onLayoutChange: function(layout) {
     	this.setState({layout: layout});
 	},
 
 	render: function() {
-		var REACT_GRID_LAYOUT_MARGIN_LEFT = 10;
+		reactGridLayoutOptions = {
+	        items: this.state.categories.length,
+	        cols: 4,
+		    isResizable: false,
+		    isDraggable: true,
+		    rowHeight: 180,
+		    autoSize: true,
+			// margin: [0,0]
+    	};
 
 		return (
 			<div className="niceish-padding ui">
 				<div className="ui ">
-					<div style={{ marginLeft: REACT_GRID_LAYOUT_MARGIN_LEFT }} className="ui card"><div className="content">
+					{this.state.categories2.length}
+					<div style={{ marginLeft: this.REACT_GRID_LAYOUT_MARGIN_LEFT }} className="ui card"><div className="content">
 						<h2><Icon n="calendar"/>{Date.create().format('{Weekday}')} <small>{Date.create().format('{ord} {Month}')}</small></h2>
 					</div></div>
 
-					<ReactGridLayout layout={this.state.layout} onLayoutChange={this.onLayoutChange} {...this.props}>
+					<ReactGridLayout layout={this.state.layout} onLayoutChange={this.onLayoutChange} {...reactGridLayoutOptions}>
 		            	{this.generateCards()}
 		            </ReactGridLayout>
 				</div>

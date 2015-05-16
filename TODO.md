@@ -4,7 +4,7 @@ TODO before v1.0.0
 **Get this sorted** so I can start using it in daily life for goals and tracking.
 
 ## Home
- - get reactive data source of metrics working
+ - get reactive data source of metrics working -> test if it is actually reactive without a template
  - react and layout the dashboard according to DB data
 
 ## Add record

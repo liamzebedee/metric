@@ -4,8 +4,8 @@
 Not yet functional - [Progress through Tumblr screenshots](http://liamz.tumblr.com/tagged/metric)
 
 !["Dashboard" Screenshot as of 14/05/2015](https://40.media.tumblr.com/58e975c33503f957e377f38be6e16e22/tumblr_noams7yveg1trskuwo1_1280.png)
-!["Add Record" Screenshot as of 26/04/2015](https://41.media.tumblr.com/59420d6161b1690a8ca7ab15c41cd36d/tumblr_nnerknUxIb1trskuwo1_1280.png)
-!["Add Metric" Screenshot as of 26/04/2015](https://40.media.tumblr.com/dfa641e9998abb4589254ed095848cee/tumblr_nnerknUxIb1trskuwo2_1280.png)
+!["Add Record" Screenshot as of 17/05/2015](https://40.media.tumblr.com/a93b26f29eeac4e596c3b51775a1a61c/tumblr_nog6cpNW5H1trskuwo2_1280.png)
+!["Add Metric" Screenshot as of 17/05/2015](https://40.media.tumblr.com/002a9dffaf2285b7a40668d85ae19af8/tumblr_nog6cpNW5H1trskuwo1_1280.png)
 
 What is **{metric}** (or more correctly, what am I building it to become):
  - An app I'm using to keep track of different metrics for self-improvement in a relational manner (Health tracking is dependent on metrics relating to my Diabetes, exercise, eating habits, Happiness is related to my self-actualization, social belonging, etc.)

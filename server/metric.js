@@ -1,7 +1,7 @@
 // Client needs this so that we can detect when the DDP (Meteor minimongo) connection has been established
 // autopackage is still included
 Meteor.publish("metrics", function () { return Metrics.find(); });
-Meteor.publish("categories", function () { return Categories.find(); });
+Meteor.publish("categories", function() { return Categories.find(); });
 Meteor.publish("records", function () { return Records.find(); });
 
 Meteor.methods({

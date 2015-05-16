@@ -37,7 +37,7 @@ routes = (
   	<Route name="add-record" path="/records/add" handler={AddRecord} />
 
   	<Route name="metric-overview" path="/metrics/:id" handler={MetricOverview} />
-  	<Route name="records-overview" path="/records-overview/*/" handler={RecordsOverview} />
+  	<Route name="records-overview" path="/records-overview/:id" handler={RecordsOverview} />
 
   	<Route name="dashboard" path="/" handler={Dashboard} />
     <DefaultRoute handler={Dashboard} />
