@@ -1,17 +1,34 @@
 // Main UI
 Meteor.startup(function(){
 
-UI = ReactMeteor.createClass({
-	render: function() {
-		return (<div> </div>);
-	}
-});
-
 Link = ReactRouter.Link;
 
 Icon = ReactMeteor.createClass({
 	render: function() {
 		return <i className={"icon "+this.props.n}></i>;
+	}
+});
+
+Breadcrumb = ReactMeteor.createClass({
+	render: function() {
+		var stuff = [];
+		var self = this;
+		this.props.items.forEach(function(item, i){
+			if(i != self.props.items.length-1) {
+				stuff.push(
+					<span key={item} className="muted section" onClick={self.props.onItemClick.bind(self, i)}>{item}</span>
+				);
+				stuff.push(<i key={i} className="right chevron icon divider"></i>)
+			} else {
+				stuff.push(<div key={item} className="active section" onClick={self.props.onItemClick.bind(self, i)}>{item}</div>);
+			}
+		});
+		
+		return (
+			<div className="ui breadcrumb">
+				{stuff}
+			</div>
+		);
 	}
 });
 
@@ -98,55 +115,6 @@ UI.Record = ReactMeteor.createClass({
 		    <p></p>
 		  </div>
 		</div>
-		);
-	}
-});
-
-UI.Metric = ReactMeteor.createClass({
-	getDefaultProps: function() {
-		return {
-			computeResult: 42,
-			categoryPath: ['Path', 'to', 'Category'],
-			name: "Metric name"
-		};
-	},
-
-	render: function() {
-		var pathAsString = this.props.categoryPath.join('/');
-
-		var resultView;
-		var resultIsText = false;
-		var result = this.props.computeResult;
-		switch(Util.getObjectType(result)) {
-			case 'string':
-				resultIsText = true;
-				resultView = result;
-				break;
-			case 'number':
-				var isPercentage = result.between(0, 1, true);
-				resultView = isPercentage ?
-							(result*100).toFixed(1)+'%' :
-							result;
-				break;
-			case 'boolean':
-				resultView = result ? 'tick' : 'cross'; // TODO
-				break;
-			case 'Date':
-				resultView = result.long(); // e.g. July 22, 2012 1:55pm
-				break;
-			default:
-				resultView = result.toString();
-		}
-
-		return (
-		  <div className="metric statistic">
-			    <div className="label">
-			      <strong>{this.props.name}</strong>
-			    </div>
-			    <div className={Util.classNames('value')}>
-			      {resultView}
-			    </div>
-		  </div>
 		);
 	}
 });
@@ -283,7 +251,7 @@ UI.JSEditor = ReactMeteor.createClass({
 	render: function() {
 		return (
 			<div id='code-editor' className="ui container">
-		    <div className='left'></div>
+		    <div className='code-editor-left'></div>
 		  </div>
 	  );
 	}

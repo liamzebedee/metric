@@ -14,21 +14,13 @@ MetricOverview = ReactMeteor.createClass({
 		};
 	},
 
-	componentDidMount: function() {
-		var self = this;
-
-		// Meteor.subscribe('records');
-		// Meteor.subscribe('categories');
-		Meteor.subscribe('metrics', this.metricDataReady);
+	startMeteorSubscriptions: function() {
+		Meteor.subscribe("metrics");
 	},
 
-	componentWillReceiveProps: function() {
-		this.metricDataReady();
-	},
-
-	metricDataReady: function(){
+	getMeteorState: function() {
 		var self = this;
-		this.setState({ metric: Metrics.findOne(self.getMetricId()) });
+		return { metric: Metrics.findOne(self.getMetricId()) };
 	},
 
 	getMetricId: function(){ return this.context.router.getCurrentParams().id; },
@@ -38,11 +30,16 @@ MetricOverview = ReactMeteor.createClass({
 	},
 
 	render: function() {
+		if(this.state.metric) {
+			var loadedMetric = <div>
+				<div>{this.state.metric.name} = {this.state.metric.computeResult}</div>
+				<button onClick={this.recomputeMetric}>Recompute</button>
+			</div>;
+		}
 		return (
 			<div>
 				<h1>Metric Overview</h1>
-				<div>{this.state.metric.name} = {this.state.metric.computeResult}</div>
-				<button onClick={this.recomputeMetric}>Recompute</button>
+				{loadedMetric}
 			</div>
 		);
 	}

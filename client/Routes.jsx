@@ -17,9 +17,7 @@ App = ReactMeteor.createClass({
 					
 					<div className="ui page ">
 					<main className="column">
-						{/*<TransitionGroup component="div" transitionName="pageTransition">*/}
 				          <RouteHandler key={name}/>
-				        {/*</TransitionGroup>*/}
 					</main>
 					</div>
 				</div>

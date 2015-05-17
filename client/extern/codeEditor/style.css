@@ -1,15 +1,10 @@
-body { margin: 0; padding: 0; }
+#code-editor { height: 100%; }
 
-html, body, #code-editor { height: 100%; }
-
-/* mysterious pre */
-body > pre { display: none } 
-
-.left, .right {
+.code-editor-left, .code-editor-right {
 	height: 100%; overflow: visible; display: block; float: left; position: relative; width: 100%;
 
 }
-.right { background: #eee; }
+.code-editor-right { background: #eee; }
 /* codemirror */
 .CodeMirror { font-size:20px; }
 

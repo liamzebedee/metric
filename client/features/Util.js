@@ -34,8 +34,9 @@ Util.isNumber = function(obj) { return !isNaN(parseFloat(obj)) };
 
 Util.getObjectType = function(obj) {
 	var type = "";
+	if(obj === null) return null;
 	if(typeof obj === "object") {
-		type = obj.constructor.name;
+		try { type = obj.constructor.name; } catch(ex) { console.log("can't find type of object: "+obj); }
 	} else {
 		type = typeof obj;
 	}

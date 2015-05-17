@@ -4,7 +4,7 @@ Meteor.startup(function(){
 Dashboard = ReactMeteor.createClass({
 	REACT_GRID_LAYOUT_MARGIN_LEFT: 10,
 
-    mixins: [React.PureRenderMixin],
+    mixins: [React.PureRenderMixin, ReactRouter.Navigation],
 
 	contextTypes: {
   		router: React.PropTypes.func.isRequired
@@ -23,89 +23,40 @@ Dashboard = ReactMeteor.createClass({
 
 	getMeteorState: function() {
 		var meteorState = {
-			categories2: []
+			categories: []
 		};
 		var categories = Categories.find().fetch();
 		categories.forEach(function(category){
 			cat = {
 				path: category.path,
+				_id: category._id,
 				metrics: []
 			};
 			cat.metrics = Metrics.find({ categoryId: category._id }).fetch();
-			meteorState.categories2.push(cat);
+			if(cat.metrics.length == 0) { return; }
+			meteorState.categories.push(cat);
 		});
+		meteorState.categories.push({
+					path: ["Life", "Social"],
+					_id: 42,
+					metrics: [
+						{ name: "Communications", computeValue: 0.509, _id: "ex" },
+						{ name: "Family", computeValue: true, _id: "ex" },
+						{ name: "Friends", computeValue: false, _id: "ex" },
+						{ name: "Romance", computeValue: true, _id: "ex" }
+					]
+				});
+		meteorState.layout = this.generateLayout(meteorState.categories);
 		return meteorState;
 	},
 
 	getInitialState: function() {
 		var state = {
-			// TODO dummy data
-			categories: [
-				{
-					path: ["Life"],
-					metrics: [
-						{ name: "Satisfaction", computeValue: 80 }
-					]
-				},
-				{
-					path: ["Life", "Health"],
-					metrics: [
-						{ name: "Diabetes", computeValue: 10.3 },
-						{ name: "Sleep", computeValue: 8 },
-						{ name: "Exercise", computeValue: 0.86 }
-					]
-				},
-				{
-					path: ["Life", "Social"],
-					metrics: [
-						{ name: "Communications", computeValue: 0.509 },
-						{ name: "Family", computeValue: true },
-						{ name: "Friends", computeValue: true },
-						{ name: "Romance", computeValue: true }
-					]
-				},
-				{
-					path: ["Life", "Me"],
-					metrics: [
-						{ name: "Commitment", computeValue: 0.85 },
-						{ name: "Self-esteem/image", computeValue: 0.79 },
-						{ name: "Opportunities", computeValue: 13 },
-						{ name: "Risk-taking", computeValue: "More!" }
-					]
-				}
-			]
+			categories: [],
+			layout: []
 		};
-		state.layout = this.generateLayout(state.categories);
 		return state;
 	},
-
-	generateCards: function() {
-		cards = [];
-
-		this.state.categories.forEach(function(category, i){
-			metricsView = [];
-			category.metrics.forEach(function(metric, i){
-				metricsView.push(
-					<div key={i} className="column">
-						<UI.Metric name={metric.name} categoryPath={category.path} computeResult={metric.computeValue}/>
-					</div>
-				);
-			});
-			cards.push(
-				<div key={i} className="ui card" style={{ display: 'inline-block' }}>
-		            	<div className="content">
-		            		<h3>{ category.path.join(' / ') }</h3>
-
-		            		<div className="ui statistics three column centered grid">
-		            			{metricsView}
-		            		</div>
-		            	</div>
-		            </div>
-			);
-		});
-
-		return cards;
-    },
 
     generateLayout: function(categoriesArray) {
       	var layout = [];
@@ -132,28 +83,62 @@ Dashboard = ReactMeteor.createClass({
     	this.setState({layout: layout});
 	},
 
+	navigateToCategory: function() {
+		
+    },
+
 	render: function() {
 		reactGridLayoutOptions = {
 	        items: this.state.categories.length,
 	        cols: 4,
 		    isResizable: false,
-		    isDraggable: true,
+		    isDraggable: false,
 		    rowHeight: 180,
 		    autoSize: true,
 			// margin: [0,0]
     	};
 
+    	if(this.state.layout.length != 0) {
+    		var cards = [];
+
+			var self = this;
+    		this.state.categories.forEach(function(category, i){
+				metricsView = [];
+				category.metrics.forEach(function(metric, i){
+					metricsView.push(
+						<div key={i} className="column">
+							<UI.Metric name={metric.name} categoryPath={category.path} computeResult={metric.computeResult} _id={metric._id}/>
+						</div>
+					);
+				});
+
+				cards.push(
+					<div key={i} className="ui card" style={{ display: 'inline-block' }}>
+		            	<div className="content">
+		            		<h3><Breadcrumb items={category.path} onItemClick={self.navigateToCategory}/></h3>
+
+		            		<div className="ui statistics three column centered grid">
+		            			{metricsView}
+		            		</div>
+		            	</div>
+		            </div>
+				);
+			});
+
+    		var reactGridLayout = (
+    			<ReactGridLayout layout={this.state.layout} onLayoutChange={this.onLayoutChange} {...reactGridLayoutOptions}>
+		         	{cards}
+		        </ReactGridLayout>);
+    	}
+
 		return (
 			<div className="niceish-padding ui">
-				<div className="ui ">
-					{this.state.categories2.length}
+				<div className="ui">
 					<div style={{ marginLeft: this.REACT_GRID_LAYOUT_MARGIN_LEFT }} className="ui card"><div className="content">
 						<h2><Icon n="calendar"/>{Date.create().format('{Weekday}')} <small>{Date.create().format('{ord} {Month}')}</small></h2>
 					</div></div>
 
-					<ReactGridLayout layout={this.state.layout} onLayoutChange={this.onLayoutChange} {...reactGridLayoutOptions}>
-		            	{this.generateCards()}
-		            </ReactGridLayout>
+					{reactGridLayout}
 				</div>
 
 			</div>
@@ -163,7 +148,40 @@ Dashboard = ReactMeteor.createClass({
 
 
 
-
+// [
+// 				{
+// 					path: ["Life"],
+// 					metrics: [
+// 						{ name: "Satisfaction", computeValue: 80 }
+// 					]
+// 				},
+// 				{
+// 					path: ["Life", "Health"],
+// 					metrics: [
+// 						{ name: "Diabetes", computeValue: 10.3 },
+// 						{ name: "Sleep", computeValue: 8 },
+// 						{ name: "Exercise", computeValue: 0.86 }
+// 					]
+// 				},
+// 				{
+// 					path: ["Life", "Social"],
+// 					metrics: [
+// 						{ name: "Communications", computeValue: 0.509 },
+// 						{ name: "Family", computeValue: true },
+// 						{ name: "Friends", computeValue: true },
+// 						{ name: "Romance", computeValue: true }
+// 					]
+// 				},
+// 				{
+// 					path: ["Life", "Me"],
+// 					metrics: [
+// 						{ name: "Commitment", computeValue: 0.85 },
+// 						{ name: "Self-esteem/image", computeValue: 0.79 },
+// 						{ name: "Opportunities", computeValue: 13 },
+// 						{ name: "Risk-taking", computeValue: "More!" }
+// 					]
+// 				}
+// 			]
 
 
 });

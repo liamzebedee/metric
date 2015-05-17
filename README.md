@@ -46,7 +46,8 @@ While developing any project, I always have too many ideas and never end up buil
  - SQL query interface for record overview
  - integration/stealing design from [Jupyter](http://jupyter.org), [Personal API hacks](https://news.ycombinator.com/item?id=5799706)
  - metrics retrieving data from external services (Fitbit)
- - import/export data
+ - import/export data to CSV based on the category schema
+ - replacing the text-based code-editor with a visual frontend, using sliders, controls, live visual update of react component view
 
 ## Thanks
 This uses these projects:

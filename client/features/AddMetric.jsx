@@ -44,7 +44,7 @@ AddMetric = ReactMeteor.createClass({
 	 	try {
 	 		Meteor.call('upsertMetric', this.state.name, this.state.categoryText, this.state.computeFunctionString);
 	 		this.clearForm();
-	 	} catch(ex) {
+	 	} catch(ex) { // TODO doesn't work
 	 		this.setState({metricError: ex.toString()});
 	 	}
 	 },
@@ -95,7 +95,7 @@ AddMetric = ReactMeteor.createClass({
 					
 	  			</div>
 
-	  			<h3 className="ui dividing header">Compute function</h3>
+	  			<h2 className="ui dividing header"><Icon n="code"/><div className="content">Compute function</div></h2>
 	  			<a href="https://github.com/liamzebedee/metric/wiki/Writing-a-metric" target="_blank"><Icon n="info circle"/> Docs</a>
 
 				{this.state.jsEditor}
