@@ -10,18 +10,16 @@ Icon = ReactMeteor.createClass({
 });
 
 Breadcrumb = ReactMeteor.createClass({
+	onItemClick: function(i){
+		this.props.onItemClick(this.props.items, i);
+	},
 	render: function() {
 		var stuff = [];
 		var self = this;
 		this.props.items.forEach(function(item, i){
-			if(i != self.props.items.length-1) {
-				stuff.push(
-					<span key={item} className="muted section" onClick={self.props.onItemClick.bind(self, i)}>{item}</span>
-				);
-				stuff.push(<i key={i} className="right chevron icon divider"></i>)
-			} else {
-				stuff.push(<div key={item} className="active section" onClick={self.props.onItemClick.bind(self, i)}>{item}</div>);
-			}
+			var lastItem = (i == self.props.items.length - 1);
+			stuff.push(<div key={item} onClick={self.onItemClick.bind(self, i)} className={Util.classNames("section", { muted: !lastItem, active: lastItem })}>{item}</div>);				
+			if(!lastItem) stuff.push(<i key={i} className="right chevron icon divider"></i>);
 		});
 		
 		return (
@@ -33,13 +31,18 @@ Breadcrumb = ReactMeteor.createClass({
 });
 
 UI.Menu = ReactMeteor.createClass({
+	mixins: [ReactRouter.Navigation],
+
+	navigateToDash: function(){
+		this.transitionTo('dashboard');
+	},
+
 	render: function() {
 		return (
 			 <nav className="ui primary inverted menu">
-			  <div className="title item">
+			  <div onClick={this.navigateToDash} className="title item">
 			        <h1>{"{metric}"}</h1>
 			   </div>
-
 
 			  <Link to="dashboard" className="item">
 				<i className="home icon"></i> Dashboard
@@ -58,7 +61,6 @@ UI.Menu = ReactMeteor.createClass({
 			        <i className="search link icon"></i>
 			      </div>
 			    </div>
-
 			  
 			</nav>
 		);
@@ -332,7 +334,6 @@ UI.CategorySearchInput = ReactMeteor.createClass({
 			resultsOnlyText.push(cat.path.join('/'));
 		});
 
-		// this.setState({ options: resultsOnlyText });
 		this.refs.typeahead.props.options = resultsOnlyText;
 	},
 

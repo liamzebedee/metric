@@ -83,9 +83,10 @@ Dashboard = ReactMeteor.createClass({
     	this.setState({layout: layout});
 	},
 
-	navigateToCategory: function() {
-		
-    },
+	navigateToCategory: function(categoryPath, indexClicked) {
+		var categoryId = Categories.findOrCreateByCategoryPath(categoryPath.splice(indexClicked).join('/'), null);
+		this.transitionTo('records-overview', {id: categoryId});
+	},
 
 	render: function() {
 		reactGridLayoutOptions = {
@@ -94,8 +95,7 @@ Dashboard = ReactMeteor.createClass({
 		    isResizable: false,
 		    isDraggable: false,
 		    rowHeight: 180,
-		    autoSize: true,
-			// margin: [0,0]
+		    autoSize: true
     	};
 
     	if(this.state.layout.length != 0) {

@@ -74,6 +74,7 @@
 
 
 
+.ui.menu.primary .title,
 .ui.breadcrumb .section {
 	cursor: pointer;
 }

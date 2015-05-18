@@ -13,22 +13,16 @@ RecordsOverview = ReactMeteor.createClass({
 		};
 	},
 
-	componentDidMount: function() {
+	getMeteorState: function() {
 		var self = this;
-
-		Meteor.subscribe('records', this.recordDataReady);
-	},
-
-	componentWillReceiveProps: function() {
-		this.metricDataReady();
-	},
-
-	metricDataReady: function(){
-		var self = this;
-		var category = Categories.findOne(self.getCategoryId());
+		var category = Categories.findOne(this.getCategoryId());
 		if(category == null) return; // TODO error
-		var recordsCursor = Records.find({ categoryId: category._id }, { limit: self.MAX_RECORD_COUNT });
-		this.setState({ metric: Metrics.findOne(self.getCategoryId()) });
+		var records = Records.find({ categoryId: category._id }, { limit: self.MAX_RECORD_COUNT }).fetch();
+		return { records: records };
+	},
+
+	startMeteorSubscriptions: function() {
+		Meteor.subscribe("metrics");
 	},
 
 	getCategoryId: function(){ return this.context.router.getCurrentParams().id; },
@@ -37,7 +31,7 @@ RecordsOverview = ReactMeteor.createClass({
 		return (
 			<div>
 				<h1>Records Overview</h1>
-				
+				{this.state.records}
 			</div>
 		);
 	}
