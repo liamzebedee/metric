@@ -202,7 +202,7 @@ AddRecord = ReactMeteor.createClass({
 						<div className="one field">
 						    <div className="required field">
 						      <label>Category</label>
-						      <UI.CategorySearchInput onNewSearchOrCategory={this.changeCategory}/>
+						      <UI.CategorySearchInput onSelect={this.changeCategory}/>
 						    </div>
 						</div>
 

@@ -8,6 +8,10 @@ App = ReactMeteor.createClass({
 	    router: React.PropTypes.func.isRequired
 	},
 
+	startMeteorSubscriptions: function(){
+		Meteor.subscribe('categories');
+	},
+
 	render: function() {
 		var name = this.context.router.getCurrentPath();
 		return (

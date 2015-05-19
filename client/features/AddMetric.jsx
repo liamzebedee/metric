@@ -49,6 +49,10 @@ AddMetric = ReactMeteor.createClass({
 	 	}
 	 },
 
+	 searchForCategory: function(input, callback) {
+	 	return callback(null, ['dog','cat']);
+	 },	
+
 	render: function() {
 		var noValidationErrors = 
 				this.state.computeFunctionValid
@@ -87,7 +91,8 @@ AddMetric = ReactMeteor.createClass({
 						    </div>
 						    <div className="required field">
 						      <label>Category</label>
-						      <UI.CategorySearchInput onNewSearchOrCategory={this.changeCategory}/>
+						      <UI.CategorySearchInput onSelect={this.changeCategory}/>
+								
 						    </div>
 						</div>
 

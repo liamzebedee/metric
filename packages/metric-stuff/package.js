@@ -7,7 +7,8 @@ Npm.depends({
  "esprima": "2.2.0",
  "escodegen": "1.6.1",
  "esprima-walk": "0.1.0",
- "gauss": "0.2.12"
+ "gauss": "0.2.12",
+ "react-autosuggest": "1.12.2"
 });
 
 Package.on_use(function (api) {

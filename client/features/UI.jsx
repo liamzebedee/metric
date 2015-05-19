@@ -303,50 +303,56 @@ SearchInput = ReactMeteor.createClass({
 
 UI.CategorySearchInput = ReactMeteor.createClass({
 	getInitialState: function() {
-		return { options: [] };
+		return { currentCategory: ""};
 	},
 
-	onKeyDown: function(event) {
-		var searchText = this.refs.typeahead.refs.entry.props.value;
-		this.searchForCategory(searchText);
-	},
-
-	selectCategory: function(category) {
-		this.props.onNewSearchOrCategory(category);
-	},
-
-	searchForCategory: function(searchText) {
-		var modifiers = 'ig';
-		var pattern = '[a-zA-Z\/ -]*';
-		var searchBits = Categories.parsePathIntoArray(searchText);
+	searchForCategory: function(searchText, callback) {
+		// var modifiers = 'ig';
+		// var pattern = '[a-zA-Z\/ -]*';
+		// var searchBits = Categories.parsePathIntoArray(searchText);
 		
-		var categoriesCursor = Categories.find({
-			// thanks https://regex101.com/
-			// took a while, but I got it
-			path: { $all: searchBits.map(function(v){ return new RegExp(v+pattern, modifiers) }) }
-		}, {});
-		var num = categoriesCursor.count();
+		// var categoriesCursor = Categories.find({
+		// 	// thanks https://regex101.com/
+		// 	// took a while, but I got it
+		// 	path: { $all: searchBits.map(function(v){ return new RegExp(v+pattern, modifiers) }) }
+		// }, {});
+		// var num = categoriesCursor.count();
 
-		var results = categoriesCursor.fetch() || [];
+		// var results = categoriesCursor.fetch() || [];
 
-		var resultsOnlyText = [];
-		results.forEach(function(cat){
-			resultsOnlyText.push(cat.path.join('/'));
+		// var resultsOnlyText = [];
+		// results.forEach(function(cat){
+		// 	resultsOnlyText.push(cat.path.join('/'));
+		// });
+
+		var cats = Categories.find().fetch();
+		var catsText = [];
+		cats.forEach(function(cat){
+			catsText.push(cat.path.join('/'));
 		});
+		var regex = new RegExp('^' + searchText, 'i');
+  		var resultsOnlyText = catsText.filter(function(cat){ return regex.test(cat) });
 
-		this.refs.typeahead.props.options = resultsOnlyText;
+		callback(null, resultsOnlyText);
+	},
+
+	onSuggestionSelected: function(suggestion, event) {
+		this.props.onSelect(suggestion);
+		event.preventDefault(); // prevent form submit
 	},
 
 	addNewCategory: function() {
-		var currentCategory = this.refs.typeahead.refs.entry.props.value;
-		Categories.findOrCreateByCategoryPath(currentCategory);
-		this.selectCategory(currentCategory);
+		Categories.findOrCreateByCategoryPath(this.state.currentCategory);
 	},
 
+	onChange: function(value) { this.setState({ currentCategory: value }); },
+
 	render: function() {
+		var self = this;
+		inputAttributes = { onChange: self.onChange };
 		return (
 			<div className="ui action input">
-				<ReactTypeahead.Typeahead ref="typeahead" className="ui search focus" placeholder="/Health/Physical/Diabetes/Blood Glucose Levels" customClasses={{ results: "results transition visible", input: "prompt", listItem: "result" }} onKeyDown={this.onKeyDown} onOptionSelected={this.selectCategory} options={this.state.options}/>
+				<Autosuggest ref="autosuggest" placeholder="/Health/Physical/Diabetes/Blood Glucose Levels" suggestions={this.searchForCategory} onSuggestionSelected={this.onSuggestionSelected} inputAttributes={inputAttributes}/>
 				<button className={Util.classNames("ui button")} onClick={this.addNewCategory}><i className="add circle icon"></i>Create</button>
 			</div>
 		);
