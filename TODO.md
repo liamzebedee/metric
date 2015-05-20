@@ -18,6 +18,5 @@ TODO before v1.0.0
 ======
 
  - implement natural language search menu on header
- - import/export data
+ - import/export CSV data
  - graphing and visualisation
- - move to nodejs w/ socket.io

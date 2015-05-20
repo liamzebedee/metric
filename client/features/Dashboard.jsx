@@ -84,7 +84,7 @@ Dashboard = ReactMeteor.createClass({
 	},
 
 	navigateToCategory: function(categoryPath, indexClicked) {
-		var categoryId = Categories.findOrCreateByCategoryPath(categoryPath.splice(indexClicked).join('/'), null);
+		var categoryId = Categories.findOrCreateByCategoryPath(categoryPath.splice(0, indexClicked+1).join('/'), null);
 		this.transitionTo('records-overview', {id: categoryId});
 	},
 

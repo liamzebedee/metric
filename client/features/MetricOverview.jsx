@@ -39,6 +39,8 @@ MetricOverview = ReactMeteor.createClass({
 		return (
 			<div>
 				<h1>Metric Overview</h1>
+				edit metric source
+				edit metric name
 				{loadedMetric}
 			</div>
 		);

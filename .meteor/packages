@@ -5,7 +5,7 @@
 # but you can also edit it by hand.
 
 meteor-platform
-#autopublish
+autopublish
 insecure
 semantic:ui-css
 reactjs:react

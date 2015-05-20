@@ -50,7 +50,8 @@ Meteor.methods({
 		var computeResult = Metrics.runComputeFunction(metric.compute);
 		console.log('recompute '+id+' with val: '+computeResult);
 		Metrics.update(id, { $set: { computeResult: computeResult } });
-	}
+	},
+
 });
 
 
@@ -62,8 +63,11 @@ When to (re)compute a metric:
 */
 Metrics.after.update(function(userId, doc, fieldNames, modifier, options){
 	// sub in new compute value
+	var needToRecomputeMetric = false;
+
 });
 Categories.after.update(function(userId, doc, fieldNames, modifier, options){
+	var needToRecomputeMetric = false;
 	
 });
 

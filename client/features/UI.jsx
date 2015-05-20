@@ -9,10 +9,26 @@ Icon = ReactMeteor.createClass({
 	}
 });
 
+CategoryBreadcrumb = ReactMeteor.createClass({
+    mixins: [ReactRouter.Navigation],
+
+	navigateToCategory: function(categoryPath, indexClicked) {
+		var pathUpTo = Util.clone(categoryPath).splice(0, indexClicked+1).join('/');
+		var categoryId = Categories.findCategoryByPath(pathUpTo, null)._id;
+		if(this.props.currentCategory._id === categoryId) return;
+		this.transitionTo('records-overview', {id: categoryId});
+	},
+
+	render: function() {
+		return <Breadcrumb items={this.props.currentCategory.path} onItemClick={this.navigateToCategory}/>;
+	}
+});
+
 Breadcrumb = ReactMeteor.createClass({
 	onItemClick: function(i){
 		this.props.onItemClick(this.props.items, i);
 	},
+
 	render: function() {
 		var stuff = [];
 		var self = this;
