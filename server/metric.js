@@ -4,11 +4,29 @@ Meteor.publish("metrics", function () { return Metrics.find(); });
 Meteor.publish("categories", function() { return Categories.find(); });
 Meteor.publish("records", function () { return Records.find(); });
 
+function updateMetric(metricData) {
+	// name, categoryId, data
+	Metrics.update({
+		name: metricData.name,
+		categoryId: metricData.categoryId
+	}, {
+		$set: metricData.data
+	}, { upsert: true }, function(err, _id){
+		mertric_id = _id;
+	});
+}
+
+function metricExists(name, categoryId) {
+	return (Metrics.findOne({
+		name: name,
+		categoryId: categoryId
+	}) == null);
+}
+
 Meteor.methods({
 	upsertMetric: function(name, fullCategoryPathString, computeFunctionCodeString) {
-		// todo check if computeFunction hasn't changed, and skip all this expensive stuff
+		// TODO check if computeFunction hasn't changed, and skip all this expensive stuff
 
-		// locate/create category in JSON tree
 		var dependenciesText = ComputeFunctionAnalyser.getDependencies(computeFunctionCodeString);
 		var dependencies = {
 			metrics: [],
@@ -26,33 +44,43 @@ Meteor.methods({
 			computeResult: null,
 			compute: computeFunctionCodeString,
 			categoryId: Categories.findOrCreateByCategoryPath(fullCategoryPathString),
-			dependencies: dependencies
+			dependencies: dependencies,
+			recomputing: false
 		};
 
-		var metric_id;
-		
-		metricData.computeResult = Metrics.runComputeFunction(metricData.compute);
-
-		Metrics.update({
-			name: metricData.name,
-			categoryId: metricData.categoryId
-		}, {
-			$set: metricData
-		}, { upsert: true }, function(err, _id){
-			mertric_id = _id;
-		});
+		recomputeMetric(metricData);
 
 		return metric_id;
 	},
 
 	recomputeMetric: function(id) {
 		var metric = Metrics.findOne(id);
-		var computeResult = Metrics.runComputeFunction(metric.compute);
-		console.log('recompute '+id+' with val: '+computeResult);
-		Metrics.update(id, { $set: { computeResult: computeResult } });
+		recomputeMetric(metric);
 	},
 
 });
+
+// Expects a metric object from the DB
+function recomputeMetric(metric) {
+	// Show feedback on client-side that we are recomputing
+	if(metricExists(metric.name, metric.categoryId)) {
+		updateMetric({
+			name: metric.name,
+			categoryId: metric.categoryId,
+			data: { recomputing: true }
+		});	
+	}
+
+	metric.computeResult = Metrics.runComputeFunction(metric.compute);
+	console.log('recompute '+id+' with val: '+metric.computeResult);
+	
+	updateMetric({
+		name: metricData.name,
+		categoryId: metricData.categoryId,
+		data: metric
+	});
+}
+
 
 
 /*
@@ -63,12 +91,29 @@ When to (re)compute a metric:
 */
 Metrics.after.update(function(userId, doc, fieldNames, modifier, options){
 	// sub in new compute value
-	var needToRecomputeMetric = false;
+	var announceChangesToDependentMetrics = false;
+	if(modifier.$set.computeResult || modifier.$set.computeFunction) {
+		announceChangesToDependentMetrics = true;
+	}
 
+
+	if(announceChangesToDependentMetrics) {
+		
+		// find metrics who depend on this metric
+		// recompute each of them
+		// metrics.forEach(recomputeMetric);
+	}
 });
-Categories.after.update(function(userId, doc, fieldNames, modifier, options){
-	var needToRecomputeMetric = false;
-	
+Records.after.update(function(userId, doc, fieldNames, modifier, options){
+	var announceChangesToDependentMetrics = false;
+	// find metrics who depend on this record category
+	// recompute each one of them
+	// metrics.forEach(recomputeMetric);
+
+	if(announceChangesToDependentMetrics) {
+
+	}
+
 });
 
 
