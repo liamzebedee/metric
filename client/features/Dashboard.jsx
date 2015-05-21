@@ -4,7 +4,7 @@ Meteor.startup(function(){
 Dashboard = ReactMeteor.createClass({
 	REACT_GRID_LAYOUT_MARGIN_LEFT: 10,
 
-    mixins: [React.PureRenderMixin, ReactRouter.Navigation],
+    mixins: [React.PureRenderMixin],
 
 	contextTypes: {
   		router: React.PropTypes.func.isRequired
@@ -83,11 +83,6 @@ Dashboard = ReactMeteor.createClass({
     	this.setState({layout: layout});
 	},
 
-	navigateToCategory: function(categoryPath, indexClicked) {
-		var categoryId = Categories.findOrCreateByCategoryPath(categoryPath.splice(0, indexClicked+1).join('/'), null);
-		this.transitionTo('records-overview', {id: categoryId});
-	},
-
 	render: function() {
 		reactGridLayoutOptions = {
 	        items: this.state.categories.length,
@@ -115,7 +110,7 @@ Dashboard = ReactMeteor.createClass({
 				cards.push(
 					<div key={i} className="ui card" style={{ display: 'inline-block' }}>
 		            	<div className="content">
-		            		<h3><Breadcrumb items={category.path} onItemClick={self.navigateToCategory}/></h3>
+		            		<h3><CategoryBreadcrumb currentCategory={category}/></h3>
 
 		            		<div className="ui statistics three column centered grid">
 		            			{metricsView}

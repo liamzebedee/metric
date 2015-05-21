@@ -3,6 +3,16 @@ Meteor.startup(function(){
 
 Link = ReactRouter.Link;
 
+LoadingIndicator = ReactMeteor.createClass({
+	getDefaultProps: function(){
+		loading: true
+	},
+
+	render: function() {
+		return this.props.loading ? <div className="ui active loader"></div> : <div></div>;
+	}
+});
+
 Icon = ReactMeteor.createClass({
 	render: function() {
 		return <i className={"icon "+this.props.n}></i>;
@@ -15,7 +25,6 @@ CategoryBreadcrumb = ReactMeteor.createClass({
 	navigateToCategory: function(categoryPath, indexClicked) {
 		var pathUpTo = Util.clone(categoryPath).splice(0, indexClicked+1).join('/');
 		var categoryId = Categories.findCategoryByPath(pathUpTo, null)._id;
-		if(this.props.currentCategory._id === categoryId) return;
 		this.transitionTo('records-overview', {id: categoryId});
 	},
 

@@ -3,10 +3,8 @@ TODO before v1.0.0
 
 **Get this sorted** so I can start using it in daily life for goals and tracking.
 
-## Add record
- - show records in table
-
 ## Add Metric
+ - edit metric page
  - make metric subscribe to changes and recompute when they happen
  - finish integrating DSL into metric JS
 
