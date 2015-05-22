@@ -44,7 +44,8 @@ Meteor.methods({
 			computeResult: null,
 			compute: computeFunctionCodeString,
 			categoryId: Categories.findOrCreateByCategoryPath(fullCategoryPathString),
-			dependencies: dependencies,
+			metricDependencies: dependencies.metrics,
+			recordDependencies: dependencies.records,
 			recomputing: false
 		};
 
@@ -57,6 +58,10 @@ Meteor.methods({
 		var metric = Metrics.findOne(id);
 		recomputeMetric(metric);
 	},
+
+	getDependencies: function(codeString) {
+		return ComputeFunctionAnalyser.getDependencies(codeString);
+	}
 
 });
 
@@ -71,7 +76,11 @@ function recomputeMetric(metric) {
 		});	
 	}
 
-	metric.computeResult = Metrics.runComputeFunction(metric.compute);
+	try {
+		metric.computeResult = Metrics.runComputeFunction(metric.compute);
+	} catch(ex) {
+		throw new Meteor.Error("runtime-error", "Your code failed to run when we tested it", ex.toString());
+	}
 	console.log('recompute '+id+' with val: '+metric.computeResult);
 	
 	updateMetric({
@@ -96,14 +105,19 @@ Metrics.after.update(function(userId, doc, fieldNames, modifier, options){
 		announceChangesToDependentMetrics = true;
 	}
 
-
 	if(announceChangesToDependentMetrics) {
+		// http://docs.mongodb.org/manual/reference/operator/query/in/
+		// http://stackoverflow.com/questions/8219409/mongodb-in-operator-vs-lot-of-single-queries
+		// http://stackoverflow.com/questions/12629692/querying-an-array-of-arrays-in-mongodb
 		
+		// Metrics.find({ metricDependencies: { $in: [] } })
 		// find metrics who depend on this metric
 		// recompute each of them
 		// metrics.forEach(recomputeMetric);
 	}
 });
+// Records.after.insert
+// Records.after.remove
 Records.after.update(function(userId, doc, fieldNames, modifier, options){
 	var announceChangesToDependentMetrics = false;
 	// find metrics who depend on this record category
@@ -123,7 +137,7 @@ Records.after.update(function(userId, doc, fieldNames, modifier, options){
 var metricApi = {};
 
 metricApi.Metrics = {
-	get: function(path) {
+	find: function(path) {
 		return Metrics.findMetricByPath(path);
 	}
 };
@@ -134,18 +148,14 @@ metricApi.Records = {
 		// timestamp
 	},
 
-	find: function(path) {
-		this.categoryId = Categories.findCategoryByPath(path);
-		return this;
-	},
-
 	since: function(sinceStr) {
 		var date = Date.create(since);
 		this.query.timestamp = { $gte : date };
 		return this;
 	},
 
-	get: function() {
+	find: function(path) {
+		this.categoryId = Categories.findCategoryByPath(path);
 		return Records.find(this.query).fetch();
 	}
 };

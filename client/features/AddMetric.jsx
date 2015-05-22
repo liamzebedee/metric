@@ -18,6 +18,8 @@ AddMetric = ReactMeteor.createClass({
 		var state = {
 			resetKey: (+new Date()), // oh I'm naughty
 
+			newMetric: true,
+
 	    	name: "",
 	    	categoryText: "",
 	    	computeFunctionString: "// Metrics('/Category/Metric name')\n// Records('/Category path/goes here/').get()\n\
@@ -41,12 +43,13 @@ AddMetric = ReactMeteor.createClass({
 	}, 
 
 	 submitForm: function() {
-	 	try {
-	 		Meteor.call('upsertMetric', this.state.name, this.state.categoryText, this.state.computeFunctionString);
-	 		this.clearForm();
-	 	} catch(ex) { // TODO doesn't work
-	 		this.setState({metricError: ex.toString()});
-	 	}
+	 	var self = this;
+	 	Meteor.call('upsertMetric', this.state.name, this.state.categoryText, this.state.computeFunctionString, function (error, result) {
+	 		if(error) {
+	 			this.setState({ runtimeError: error });
+	 		}
+	 		else self.clearForm(); // don't clear until server is good
+	 	});
 	 },
 
 	 searchForCategory: function(input, callback) {
@@ -71,7 +74,7 @@ AddMetric = ReactMeteor.createClass({
 			<div key={this.state.resetKey} className="niceish-padding">
 				<div className="ui segment">
 			      
-			     <h1 style={{ display: 'inline-block' }}>Add Metric</h1>
+			     <h1 style={{ display: 'inline-block' }}>{this.state.newMetric ? 'Add' : 'Edit'} Metric</h1>
 
 			     {errorbox}
 			      
@@ -103,6 +106,16 @@ AddMetric = ReactMeteor.createClass({
 	  			<h2 className="ui dividing header"><Icon n="code"/><div className="content">Compute function</div></h2>
 	  			<a href="https://github.com/liamzebedee/metric/wiki/Writing-a-metric" target="_blank"><Icon n="info circle"/> Docs</a>
 
+	  			{if(this.state.runtimeError) { }
+	  			<div className="ui negative message">
+				  <Icon n="close icon"/>
+				  <div className="header">
+				    {this.state.runtimeError.reason}
+				  </div>
+				  <p>{this.state.runtimeError.details}</p>
+				</div>
+				{ } }
+				
 				{this.state.jsEditor}
 	  		</div>
 		);

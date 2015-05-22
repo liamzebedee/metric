@@ -5,6 +5,7 @@ TODO before v1.0.0
 
 ## Add Metric
  - edit metric page
+ - make metrics preprocess errors
  - make metric subscribe to changes and recompute when they happen
  - finish integrating DSL into metric JS
 

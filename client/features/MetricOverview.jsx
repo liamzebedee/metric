@@ -10,7 +10,8 @@ MetricOverview = ReactMeteor.createClass({
 			metric: {
 				name: "",
 				computeResult: null
-			}
+			},
+			deps: []
 		};
 	},
 
@@ -29,11 +30,16 @@ MetricOverview = ReactMeteor.createClass({
 		Meteor.call('recomputeMetric', this.getMetricId());
 	},
 
+	getDependencies: function(){
+		this.setState({ deps: JSON.stringify(Meteor.call('getDependencies', this.state.metric.computeFunction)) });
+	},
+
 	render: function() {
 		if(this.state.metric) {
 			var loadedMetric = <div>
 				<div>{this.state.metric.name} = {this.state.metric.computeResult}</div>
 				<button onClick={this.recomputeMetric}>Recompute</button>
+				<button onClick={this.getDependencies}>Get deps</button>
 			</div>;
 		}
 		return (
@@ -41,6 +47,7 @@ MetricOverview = ReactMeteor.createClass({
 				<h1>Metric Overview</h1>
 				edit metric source
 				edit metric name
+				{this.state.deps}
 				{loadedMetric}
 			</div>
 		);

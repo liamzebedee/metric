@@ -16,8 +16,8 @@ ComputeFunctionAnalyser.getDependencies = function(computeFunctionCodeString) {
 			var name = node.callee.object.name;
 			var prop = node.callee.property.name;
 
-			if(name == 'Metrics') {
-				// Metrics.find(category, name)
+			if(name == 'Metrics' && prop == 'find') {
+				// Metrics.find(path)
 				var dependencyString = eval(escodegen.generate(node.arguments[0]));
 				dependencies.metrics.push(dependencyString);
 
