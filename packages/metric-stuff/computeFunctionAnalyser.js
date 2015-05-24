@@ -4,7 +4,11 @@ var walk = Npm.require('esprima-walk');
 
 ComputeFunctionAnalyser = {};
 ComputeFunctionAnalyser.getDependencies = function(computeFunctionCodeString) {
-	var ast = esprima.parse(computeFunctionCodeString, { raw: true });
+	try {
+		var ast = esprima.parse(computeFunctionCodeString, { raw: true });
+	} catch(ex) {
+		throw new Meteor.Error("parsing-error", "Your code has syntax errors", ex.toString());
+	}
 
 	var dependencies = {
 		metrics: [],

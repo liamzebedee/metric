@@ -36,16 +36,6 @@ Dashboard = ReactMeteor.createClass({
 			if(cat.metrics.length == 0) { return; }
 			meteorState.categories.push(cat);
 		});
-		meteorState.categories.push({
-					path: ["Life", "Social"],
-					_id: 42,
-					metrics: [
-						{ name: "Communications", computeValue: 0.509, _id: "ex" },
-						{ name: "Family", computeValue: true, _id: "ex" },
-						{ name: "Friends", computeValue: false, _id: "ex" },
-						{ name: "Romance", computeValue: true, _id: "ex" }
-					]
-				});
 		meteorState.layout = this.generateLayout(meteorState.categories);
 		return meteorState;
 	},
@@ -88,7 +78,7 @@ Dashboard = ReactMeteor.createClass({
 	        items: this.state.categories.length,
 	        cols: 4,
 		    isResizable: false,
-		    isDraggable: false,
+		    isDraggable: true,
 		    rowHeight: 180,
 		    autoSize: true
     	};
@@ -177,6 +167,16 @@ Dashboard = ReactMeteor.createClass({
 // 					]
 // 				}
 // 			]
+// meteorState.categories.push({
+// 					path: ["Life", "Social"],
+// 					_id: 42,
+// 					metrics: [
+// 						{ name: "Communications", computeValue: 0.509, _id: "ex" },
+// 						{ name: "Family", computeValue: true, _id: "ex" },
+// 						{ name: "Friends", computeValue: false, _id: "ex" },
+// 						{ name: "Romance", computeValue: true, _id: "ex" }
+// 					]
+// 				});
 
 
 });

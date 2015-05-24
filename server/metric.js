@@ -59,6 +59,16 @@ Meteor.methods({
 		recomputeMetric(metric);
 	},
 
+	testNewMetricCode: function(newCodeString) {
+		var dependencies = this.getDependencies(newCodeString);
+		var computeResult = Metrics.runComputeFunction(newCodeString);
+		return {
+			computeResult: computeResult,
+			metricDependencies: dependencies.metrics,
+			recordDependencies: dependencies.records
+		};
+	},
+
 	getDependencies: function(codeString) {
 		return ComputeFunctionAnalyser.getDependencies(codeString);
 	}
@@ -76,16 +86,13 @@ function recomputeMetric(metric) {
 		});	
 	}
 
-	try {
-		metric.computeResult = Metrics.runComputeFunction(metric.compute);
-	} catch(ex) {
-		throw new Meteor.Error("runtime-error", "Your code failed to run when we tested it", ex.toString());
-	}
-	console.log('recompute '+id+' with val: '+metric.computeResult);
+	metric.computeResult = Metrics.runComputeFunction(metric.compute);
+
+	console.log('recompute '+metric.id+' with val: '+metric.computeResult);
 	
 	updateMetric({
-		name: metricData.name,
-		categoryId: metricData.categoryId,
+		name: metric.name,
+		categoryId: metric.categoryId,
 		data: metric
 	});
 }
@@ -164,13 +171,18 @@ metricApi.Vector = ComputeFunctionHelpers.gauss.Vector;
 metricApi.Collection = ComputeFunctionHelpers.gauss.Collection;
 
 Metrics.runComputeFunction = function(computeFunctionCodeString) {
-	var func = Function(
-		'Metrics', 
-		'Records', 
-		computeFunctionCodeString);
-	var result = func(
-		metricApi.Metrics,
-		metricApi.Records);
+	var result;
+	try {
+		var func = Function(
+			'Metrics', 
+			'Records', 
+			computeFunctionCodeString);
+		result = func(
+			metricApi.Metrics,
+			metricApi.Records);
+	} catch(ex) {
+		throw new Meteor.Error("runtime-error", "Your code failed to run when we tested it", ex.toString());
+	}
 	return result;
 }
 

@@ -4,8 +4,8 @@ TODO before v1.0.0
 **Get this sorted** so I can start using it in daily life for goals and tracking.
 
 ## Add Metric
- - edit metric page
- - make metrics preprocess errors
+ - test on server metric.js using http://chaijs.com/ https://github.com/meteor-velocity/velocity and mocha
+ - edit metric page (code editor)
  - make metric subscribe to changes and recompute when they happen
  - finish integrating DSL into metric JS
 
