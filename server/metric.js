@@ -12,7 +12,7 @@ function updateMetric(metricData) {
 	}, {
 		$set: metricData.data
 	}, { upsert: true }, function(err, _id){
-		mertric_id = _id;
+		metric_id = _id;
 	});
 }
 
@@ -49,9 +49,7 @@ Meteor.methods({
 			recomputing: false
 		};
 
-		recomputeMetric(metricData);
-
-		return metric_id;
+		return recomputeMetric(metricData);
 	},
 
 	recomputeMetric: function(id) {
@@ -90,7 +88,7 @@ function recomputeMetric(metric) {
 
 	console.log('recompute '+metric.id+' with val: '+metric.computeResult);
 	
-	updateMetric({
+	return updateMetric({
 		name: metric.name,
 		categoryId: metric.categoryId,
 		data: metric
@@ -167,21 +165,27 @@ metricApi.Records = {
 	}
 };
 
-metricApi.Vector = ComputeFunctionHelpers.gauss.Vector;
-metricApi.Collection = ComputeFunctionHelpers.gauss.Collection;
+metricApi.metric = {
+	computeResult: null
+};
+
+Vector = ComputeFunctionHelpers.gauss.Vector;
+Collection = ComputeFunctionHelpers.gauss.Collection;
 
 Metrics.runComputeFunction = function(computeFunctionCodeString) {
 	var result;
 	try {
 		var func = Function(
 			'Metrics', 
-			'Records', 
+			'Records',
+			'metric',
 			computeFunctionCodeString);
 		result = func(
 			metricApi.Metrics,
-			metricApi.Records);
+			metricApi.Records,
+			metricApi.metric);
 	} catch(ex) {
-		throw new Meteor.Error("runtime-error", "Your code failed to run when we tested it", ex.toString());
+		throw new Meteor.Error("runtime-error", "Your code failed to run when we tested it: " + ex.toString(), ex.toString());
 	}
 	return result;
 }

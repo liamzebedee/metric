@@ -7,7 +7,7 @@ ComputeFunctionAnalyser.getDependencies = function(computeFunctionCodeString) {
 	try {
 		var ast = esprima.parse(computeFunctionCodeString, { raw: true });
 	} catch(ex) {
-		throw new Meteor.Error("parsing-error", "Your code has syntax errors", ex.toString());
+		throw new Meteor.Error("parsing-error", "Your code has syntax errors: " + ex.toString(), ex.toString());
 	}
 
 	var dependencies = {
