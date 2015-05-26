@@ -86,7 +86,7 @@ function recomputeMetric(metric) {
 
 	metric.computeResult = Metrics.runComputeFunction(metric.compute);
 
-	console.log('recompute '+metric.id+' with val: '+metric.computeResult);
+	console.log('recompute '+metric._id+' with val: '+metric.computeResult);
 	
 	return updateMetric({
 		name: metric.name,
@@ -106,7 +106,7 @@ When to (re)compute a metric:
 Metrics.after.update(function(userId, doc, fieldNames, modifier, options){
 	// sub in new compute value
 	var announceChangesToDependentMetrics = false;
-	if(modifier.$set.computeResult || modifier.$set.computeFunction) {
+	if(modifier.$set.computeResult || modifier.$set.compute) {
 		announceChangesToDependentMetrics = true;
 	}
 
@@ -165,29 +165,29 @@ metricApi.Records = {
 	}
 };
 
-metricApi.metric = {
-	computeResult: null
+metricApi.metric = function(){
+	this.result = null;
 };
 
 Vector = ComputeFunctionHelpers.gauss.Vector;
 Collection = ComputeFunctionHelpers.gauss.Collection;
 
 Metrics.runComputeFunction = function(computeFunctionCodeString) {
-	var result;
+	var metric = null;
 	try {
 		var func = Function(
 			'Metrics', 
 			'Records',
 			'metric',
 			computeFunctionCodeString);
-		result = func(
+		metric = new func(
 			metricApi.Metrics,
 			metricApi.Records,
-			metricApi.metric);
+			metric);
 	} catch(ex) {
 		throw new Meteor.Error("runtime-error", "Your code failed to run when we tested it: " + ex.toString(), ex.toString());
 	}
-	return result;
+	return metric.result;
 }
 
 

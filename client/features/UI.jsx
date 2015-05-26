@@ -129,23 +129,6 @@ UI.Columns = ReactMeteor.createClass({
 	}
 });
 
-UI.Record = ReactMeteor.createClass({
-	render: function() {
-		return (
-		<div className="ui card">
-		  <div className="content">
-		    <div className="header">Cute Dog</div>
-		    <div className="meta">
-		      <span>2 days ago</span>
-		      <a>Animals</a>
-		    </div>
-		    <p></p>
-		  </div>
-		</div>
-		);
-	}
-});
-
   // <tfoot className="full-width">
   //   <tr>
   //     <th></th>
@@ -255,7 +238,7 @@ UI.JSONBoolean = ReactMeteor.createClass({
 UI.JSEditor = ReactMeteor.createClass({
 	componentDidMount:  function() {
 		var editor = jsEditor({
-		    value: this.props.code,
+		    value: this.props.code || "",
 		    mode: "javascript",
 		    lineNumbers: true,
 		    matchBrackets: true,
@@ -327,10 +310,6 @@ SearchInput = ReactMeteor.createClass({
 
 
 UI.CategorySearchInput = ReactMeteor.createClass({
-	getInitialState: function() {
-		return { currentCategory: ""};
-	},
-
 	searchForCategory: function(searchText, callback) {
 		// var modifiers = 'ig';
 		// var pattern = '[a-zA-Z\/ -]*';
@@ -370,14 +349,14 @@ UI.CategorySearchInput = ReactMeteor.createClass({
 		Categories.findOrCreateByCategoryPath(this.state.currentCategory);
 	},
 
-	onChange: function(value) { this.setState({ currentCategory: value }); },
-
 	render: function() {
 		var self = this;
-		inputAttributes = { onChange: self.onChange };
+		var inputAttributes = {
+			value: this.props.category
+		};
 		return (
 			<div className="ui action input">
-				<Autosuggest ref="autosuggest" placeholder="/Health/Physical/Diabetes/Blood Glucose Levels" suggestions={this.searchForCategory} onSuggestionSelected={this.onSuggestionSelected} inputAttributes={inputAttributes}/>
+				<Autosuggest ref="autosuggest" placeholder="/Health/Physical/Diabetes/Blood Glucose Levels" suggestions={this.searchForCategory} inputAttributes={inputAttributes} onSuggestionSelected={this.onSuggestionSelected}/>
 				<button className={Util.classNames("ui button")} onClick={this.addNewCategory}><i className="add circle icon"></i>Create</button>
 			</div>
 		);

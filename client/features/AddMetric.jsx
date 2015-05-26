@@ -14,24 +14,31 @@ AddMetric = ReactMeteor.createClass({
 	    router: React.PropTypes.func.isRequired
 	  },
 
+	  getInitialProps: function() {
+	  	return {
+	  		name: this.props.name || "",
+	  		categoryText: this.props.categoryText || "",
+	  		computeFunctionString: this.props.computeFunctionString || "// Metrics('/Category/Metric name')\n// Records('/Category path/goes here/').get()\n\
+// the return value is your output\n",
+			
+			newMetric: this.props.newMetric && true
+	  	};
+	  },
+
 	getInitialState: function() {
 		var state = {
 			resetKey: (+new Date()), // oh I'm naughty
 
-			newMetric: true,
+			newMetric: this.props.newMetric,
 			runtimeError: null,
 
-	    	name: "",
-	    	categoryText: "",
-	    	computeFunctionString: "// Metrics('/Category/Metric name')\n// Records('/Category path/goes here/').get()\n\
-// the return value is your output\n",
+	    	name: this.props.name,
+	    	categoryText: this.props.categoryText,
+	    	computeFunctionString: this.props.computeFunctionString,
 	    	computeFunctionValid: true
 	    };
-	    state.jsEditor = (<UI.JSEditor 
-					    	code={state.computeFunctionString} 
-					    	onValidation={this.onEditorValidation}/>);
 	    return state;
-	  },
+	},
 
 	 clearForm: function() {
 	 	this.replaceState(this.getInitialState());
@@ -39,7 +46,17 @@ AddMetric = ReactMeteor.createClass({
 
 	changeCategory: function(category) {
 		this.setState({ categoryText: category });
-	}, 
+	},
+
+	componentWillReceiveProps: function(nextProps){
+		var state = {
+			name: nextProps.name,
+	    	categoryText: nextProps.categoryText,
+	    	computeFunctionString: nextProps.computeFunctionString
+		};
+		this.setState(state);
+		console.log('ello');
+	},
 
 	 submitForm: function() {
 	 	var self = this;
@@ -99,7 +116,7 @@ AddMetric = ReactMeteor.createClass({
 						    </div>
 						    <div className="required field">
 						      <label>Category</label>
-						      <UI.CategorySearchInput onSelect={this.changeCategory}/>
+						      <UI.CategorySearchInput category={this.state.categoryText} onSelect={this.changeCategory}/>
 								
 						    </div>
 						</div>
@@ -113,7 +130,8 @@ AddMetric = ReactMeteor.createClass({
 	  			
 				{runtimeError}
 
-				{this.state.jsEditor}
+				<UI.JSEditor code={this.state.computeFunctionString} 
+					    	 onValidation={this.onEditorValidation}/>
 	  		</div>
 		);
 	}

@@ -11,13 +11,28 @@ MochaWeb.testOnly(function(){
 			computeFunction: "a = 1; a++; metric.value = a;"
 		};
 
-		it("should be created successfully", function(){
-			var metric_id = Meteor.call(
+		it("should be created successfully", function(done){
+			var fn = function(){ Meteor.call(
 				"upsertMetric", 
 				basicMetricData.name, 
 				basicMetricData.fullCategoryPathString, 
-				basicMetricData.computeFunction
-			);
+				basicMetricData.computeFunction,
+				function(error, result){
+					try {
+						chai.expect(error).to.not.exist;
+
+						var metric = Metrics.find(metric_id);
+						throw new Error(JSON.stringify(metric));
+						chai.expect(metric).to.exist;
+						var category = Categories.find(metric.categoryId);
+						chai.expect(category).to.exist;
+						chai.expect(category.path).to.be(basicMetricData.fullCategoryPathString.split('/'));
+						chai.expect(metric.name).to.be(basicMetricData.name);
+						chai.expect(metric.computeFunction).to.be(basicMetricData.computeFunction);
+					} catch(ex) {throw ex} finally { done(); }
+				}
+			); }
+			chai.expect(fn).to.not.throw(Error);
 		});
 
 		it("should throw a syntax error", function(){
@@ -26,7 +41,7 @@ MochaWeb.testOnly(function(){
 				basicMetricData.name, 
 				basicMetricData.fullCategoryPathString, 
 				"a = 1; /syntax error"
-			); }
+			); done(); }
 			chai.expect(fn).to.throw('[parsing-error]');
 		});
 
