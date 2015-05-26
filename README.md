@@ -3,7 +3,7 @@
 
 Not yet functional - [Progress through Tumblr screenshots](http://liamz.tumblr.com/tagged/metric)
 
-!["Dashboard" Screenshot as of 14/05/2015](https://40.media.tumblr.com/58e975c33503f957e377f38be6e16e22/tumblr_noams7yveg1trskuwo1_1280.png)
+!["Dashboard" Screenshot as of 26/05/2015](https://41.media.tumblr.com/3e2f50eaf28999fbe9b7e116e2ab4c89/tumblr_noy93v35L11trskuwo2_1280.png)
 !["Add Record" Screenshot as of 17/05/2015](https://40.media.tumblr.com/a93b26f29eeac4e596c3b51775a1a61c/tumblr_nog6cpNW5H1trskuwo2_1280.png)
 !["Add Metric" Screenshot as of 17/05/2015](https://40.media.tumblr.com/002a9dffaf2285b7a40668d85ae19af8/tumblr_nog6cpNW5H1trskuwo1_1280.png)
 
@@ -14,6 +14,7 @@ What is **{metric}** (or more correctly, what am I building it to become):
 
 Key points:
  - unlike Excel, we don't do tables
+ - we do smart dashboards!
  - we do metrics and records
  - metrics are dynamically computed functions written in JavaScript, a record is just a JSON object
  - it's all built with web tech, it's real-time using Meteor and React

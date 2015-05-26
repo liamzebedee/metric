@@ -241,6 +241,7 @@ UI.JSEditor = ReactMeteor.createClass({
 		    value: this.props.code || "",
 		    mode: "javascript",
 		    lineNumbers: true,
+		    lineWrapping: true,
 		    matchBrackets: true,
 		    indentWithTabs: true,
 		    tabSize: 2,

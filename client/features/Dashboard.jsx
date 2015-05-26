@@ -36,14 +36,12 @@ Dashboard = ReactMeteor.createClass({
 			if(cat.metrics.length == 0) { return; }
 			meteorState.categories.push(cat);
 		});
-		meteorState.layout = this.generateLayout(meteorState.categories);
 		return meteorState;
 	},
 
 	getInitialState: function() {
 		var state = {
-			categories: [],
-			layout: []
+			categories: []
 		};
 		return state;
 	},
@@ -69,11 +67,8 @@ Dashboard = ReactMeteor.createClass({
         return layout;
     },
 
-	onLayoutChange: function(layout) {
-    	this.setState({layout: layout});
-	},
-
 	render: function() {
+		var layout = this.generateLayout(this.state.categories);
 		reactGridLayoutOptions = {
 	        items: this.state.categories.length,
 	        cols: 4,
@@ -83,7 +78,7 @@ Dashboard = ReactMeteor.createClass({
 		    autoSize: true
     	};
 
-    	if(this.state.layout.length != 0) {
+    	if(layout.length != 0) {
     		var cards = [];
 
 			var self = this;
@@ -111,7 +106,7 @@ Dashboard = ReactMeteor.createClass({
 			});
 
     		var reactGridLayout = (
-    			<ReactGridLayout layout={this.state.layout} onLayoutChange={this.onLayoutChange} {...reactGridLayoutOptions}>
+    			<ReactGridLayout layout={layout} onLayoutChange={this.onLayoutChange} {...reactGridLayoutOptions}>
 		         	{cards}
 		        </ReactGridLayout>);
     	}

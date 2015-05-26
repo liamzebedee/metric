@@ -90,7 +90,7 @@ AddMetric = ReactMeteor.createClass({
 			  <div className="header">
 			    {this.state.runtimeError.reason}
 			  </div>
-			  <p>{this.state.runtimeError.details}</p>
+			  <pre>{this.state.runtimeError.details}</pre>
 			</div>;
 		} 
 

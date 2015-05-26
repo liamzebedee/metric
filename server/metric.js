@@ -6,12 +6,11 @@ Meteor.publish("records", function () { return Records.find(); });
 
 function updateMetric(metricData) {
 	// name, categoryId, data
+	var modifier = metricData.fullReplace ? metricData.data : { $set: metricData.data };
 	Metrics.update({
 		name: metricData.name,
 		categoryId: metricData.categoryId
-	}, {
-		$set: metricData.data
-	}, { upsert: true }, function(err, _id){
+	}, modifier, { upsert: true }, function(err, _id){
 		metric_id = _id;
 	});
 }
@@ -80,6 +79,7 @@ function recomputeMetric(metric) {
 		updateMetric({
 			name: metric.name,
 			categoryId: metric.categoryId,
+			fullReplace: false,
 			data: { recomputing: true }
 		});	
 	}
@@ -91,6 +91,7 @@ function recomputeMetric(metric) {
 	return updateMetric({
 		name: metric.name,
 		categoryId: metric.categoryId,
+		fullReplace: true,
 		data: metric
 	});
 }
@@ -140,37 +141,60 @@ Records.after.update(function(userId, doc, fieldNames, modifier, options){
 
 // This is what the compute function gets as parameters
 var metricApi = {};
+Vector = ComputeFunctionHelpers.gauss.Vector;
+Collection = ComputeFunctionHelpers.gauss.Collection;
 
-metricApi.Metrics = {
-	find: function(path) {
-		return Metrics.findMetricByPath(path);
-	}
+metricApi.Metrics = function() {
+	return {
+		find: function(path) {
+			return Metrics.findMetricByPath(path);
+		}
+	};
 };
 
-metricApi.Records = {
-	query: {
-		categoryId: null
-		// timestamp
-	},
+metricApi.Records = function() {
+	return {
+		query: {
+			categoryId: null
+			// timestamp
+		},
 
-	since: function(sinceStr) {
-		var date = Date.create(since);
-		this.query.timestamp = { $gte : date };
-		return this;
-	},
+		since: function(sinceStr, field) {
+			var date = Date.create(sinceStr).getTime();
+			if(field && field.length > 0) this.query["fields." + field] = { $gte : date };
+			else this.query.timestamp = { $gte : date };
+			return this;
+		},
 
-	find: function(path) {
-		this.categoryId = Categories.findCategoryByPath(path);
-		return Records.find(this.query).fetch();
-	}
+		find: function(path) {
+			var category = Categories.findCategoryByPath(path);
+			this.query.categoryId = category._id;
+			console.log(JSON.stringify(this.query));
+			return MetricRecords(Records.find(this.query).fetch());
+		}
+	};
 };
+
+function MetricRecords(values) {
+	var metricRecords = new Vector(values);
+
+	metricRecords.select = function(fieldName) {
+		// var type = Util.getObjectType(fields);
+		// if(type == 'Array') {
+		// 	for (var i = 0, field; field = fields[i]; i++) {
+
+		// 	}
+		// }
+		return metricRecords.map(function(record){ return record.fields[fieldName]; });
+	};
+	metricRecords.average = metricRecords.mean;
+	return metricRecords;
+}
 
 metricApi.metric = function(){
 	this.result = null;
 };
 
-Vector = ComputeFunctionHelpers.gauss.Vector;
-Collection = ComputeFunctionHelpers.gauss.Collection;
 
 Metrics.runComputeFunction = function(computeFunctionCodeString) {
 	var metric = null;
@@ -181,22 +205,11 @@ Metrics.runComputeFunction = function(computeFunctionCodeString) {
 			'metric',
 			computeFunctionCodeString);
 		metric = new func(
-			metricApi.Metrics,
-			metricApi.Records,
+			metricApi.Metrics(),
+			metricApi.Records(),
 			metric);
 	} catch(ex) {
-		throw new Meteor.Error("runtime-error", "Your code failed to run when we tested it: " + ex.toString(), ex.toString());
+		throw new Meteor.Error("runtime-error", "Your code failed to run when we tested it: " + ex.toString(), ex.stack);
 	}
 	return metric.result;
 }
-
-
-/*
-In the end I want to write the HealthMetric like this:
-
-return average(Metrics('/Health/DiabetesMetric').computeValue, Metrics.get('/Health/Body/ExerciseMetric'));
-
-And DiabetesMetric
-
-return average(Records('/Health/Body/Exercise/').since('two weeks ago').get())
-*/

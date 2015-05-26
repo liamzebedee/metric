@@ -11,6 +11,8 @@ MochaWeb.testOnly(function(){
 			computeFunction: "a = 1; a++; metric.value = a;"
 		};
 
+		// This one doesn't actually test
+		// TODO fix this
 		it("should be created successfully", function(done){
 			var fn = function(){ Meteor.call(
 				"upsertMetric", 
@@ -62,9 +64,6 @@ MochaWeb.testOnly(function(){
 			// 	basicMetricData.fullCategoryPathString, 
 			// 	"var dep = Metrics.find('/some/metric'); var dep2 = Records.find('/some/category');"
 			// );
-
 		});
-
-
 	});
 });

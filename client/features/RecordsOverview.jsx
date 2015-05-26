@@ -48,6 +48,7 @@ RecordsOverview = ReactMeteor.createClass({
 		return (
 			<div className="niceish-padding ui segment">
 				<h1>{this.state.meteorLoaded ? <CategoryBreadcrumb currentCategory={this.state.category}/> : ''}</h1>
+				<p>{this.state.records.length} records</p>
 				<table className="ui celled table">
 					<thead><tr>
 						{header}
