@@ -11,6 +11,7 @@ function updateMetric(metricData) {
 		name: metricData.name,
 		categoryId: metricData.categoryId
 	}, modifier, { upsert: true }, function(err, _id){
+		if(err) throw new Error(err.toString());
 		metric_id = _id;
 	});
 }
@@ -25,30 +26,36 @@ function metricExists(name, categoryId) {
 Meteor.methods({
 	upsertMetric: function(name, fullCategoryPathString, computeFunctionCodeString) {
 		// TODO check if computeFunction hasn't changed, and skip all this expensive stuff
+		var metricData;
 
-		var dependenciesText = ComputeFunctionAnalyser.getDependencies(computeFunctionCodeString);
-		var dependencies = {
-			metrics: [],
-			records: []
-		};
-		dependenciesText.metrics.forEach(function(metric){
-			dependencies.metrics.push(Metrics.findMetricByPath(metric)._id);
-		});
-		dependenciesText.records.forEach(function(categoryPath){
-			dependencies.records.push(Categories.findCategoryByPath(categoryPath)._id);
-		});
+		try {
+			var dependenciesText = ComputeFunctionAnalyser.getDependencies(computeFunctionCodeString);
+			var dependencies = {
+				metrics: [],
+				records: []
+			};
+			dependenciesText.metrics.forEach(function(metric){
+				dependencies.metrics.push(Metrics.findMetricByPath(metric)._id);
+			});
+			dependenciesText.records.forEach(function(categoryPath){
+				dependencies.records.push(Categories.findCategoryByPath(categoryPath)._id);
+			});
 
-		var metricData = {
-			name: name,
-			computeResult: null,
-			compute: computeFunctionCodeString,
-			categoryId: Categories.findOrCreateByCategoryPath(fullCategoryPathString),
-			metricDependencies: dependencies.metrics,
-			recordDependencies: dependencies.records,
-			recomputing: false
-		};
+			metricData = {
+				name: name,
+				computeResult: null,
+				compute: computeFunctionCodeString,
+				categoryId: Categories.findOrCreateByCategoryPath(fullCategoryPathString),
+				metricDependencies: dependencies.metrics,
+				recordDependencies: dependencies.records,
+				recomputing: false
+			};
 
-		return recomputeMetric(metricData);
+		} catch(ex) {
+			throw new Meteor.Error("parsing-error", "Your code is wrong", ex.toString());
+		}
+
+		recomputeMetric(metricData);
 	},
 
 	recomputeMetric: function(id) {
@@ -74,26 +81,31 @@ Meteor.methods({
 
 // Expects a metric object from the DB
 function recomputeMetric(metric) {
-	// Show feedback on client-side that we are recomputing
-	if(metricExists(metric.name, metric.categoryId)) {
-		updateMetric({
+	try {
+		// Show feedback on client-side that we are recomputing
+		if(metricExists(metric.name, metric.categoryId)) {
+			updateMetric({
+				name: metric.name,
+				categoryId: metric.categoryId,
+				fullReplace: false,
+				data: { recomputing: true }
+			});	
+		}
+
+		metric.computeResult = Metrics.runComputeFunction(metric.compute).result;
+		metric.recomputing = false;
+
+		console.log('recompute '+metric._id+' with val: '+metric.computeResult);
+		
+		return updateMetric({
 			name: metric.name,
 			categoryId: metric.categoryId,
-			fullReplace: false,
-			data: { recomputing: true }
-		});	
+			fullReplace: true,
+			data: metric
+		});
+	} catch(ex) {
+		throw new Meteor.Error("runtime-error", "Your metric failed to run", ex.stack);
 	}
-
-	metric.computeResult = Metrics.runComputeFunction(metric.compute);
-
-	console.log('recompute '+metric._id+' with val: '+metric.computeResult);
-	
-	return updateMetric({
-		name: metric.name,
-		categoryId: metric.categoryId,
-		fullReplace: true,
-		data: metric
-	});
 }
 
 
@@ -104,37 +116,42 @@ When to (re)compute a metric:
  - when a metric.computeResult changes that this metric depends on 
  - when a record is added to a category that this metric depends on
 */
-Metrics.after.update(function(userId, doc, fieldNames, modifier, options){
+
+Metrics.after.insert(onMetricsInsertOrUpdate);
+Metrics.after.update(onMetricsInsertOrUpdate);
+function onMetricsInsertOrUpdate(userId, doc, fieldNames, modifier, options){
 	// sub in new compute value
 	var announceChangesToDependentMetrics = false;
-	if(modifier.$set.computeResult || modifier.$set.compute) {
+	if(modifier.computeResult || modifier.compute) {
 		announceChangesToDependentMetrics = true;
 	}
 
 	if(announceChangesToDependentMetrics) {
-		// http://docs.mongodb.org/manual/reference/operator/query/in/
-		// http://stackoverflow.com/questions/8219409/mongodb-in-operator-vs-lot-of-single-queries
-		// http://stackoverflow.com/questions/12629692/querying-an-array-of-arrays-in-mongodb
-		
-		// Metrics.find({ metricDependencies: { $in: [] } })
-		// find metrics who depend on this metric
-		// recompute each of them
-		// metrics.forEach(recomputeMetric);
+		var dependentMetrics = Metrics.find({
+			metricDependencies: { $in: [doc._id] }
+		});
+		dependentMetrics.forEach(function(metric){
+			if(metric._id == doc._id) {
+				// Basic check. No, this is not the solution to the halting problem.
+				// Then again... https://xkcd.com/1266/
+				console.log("Metric "+JSON.stringify(metric)+" depends on itself and will compute in an infinite loop. Stopping to avoid harm.");
+				return;
+			}
+			recomputeMetric(metric);
+		});
 	}
-});
-// Records.after.insert
-// Records.after.remove
-Records.after.update(function(userId, doc, fieldNames, modifier, options){
-	var announceChangesToDependentMetrics = false;
-	// find metrics who depend on this record category
-	// recompute each one of them
-	// metrics.forEach(recomputeMetric);
+}
 
-	if(announceChangesToDependentMetrics) {
+Records.after.insert(onRecordsChange)
+Records.after.remove(onRecordsChange)
+Records.after.update(onRecordsChange);
+function onRecordsChange(userId, doc, fieldNames, modifier, options) {
+	var dependentMetrics = Metrics.find({
+		recordDependencies: { $in: [doc.categoryId || modifier.categoryId] }
+	});
+	dependentMetrics.forEach(recomputeMetric);
+}
 
-	}
-
-});
 
 
 
@@ -144,36 +161,49 @@ var metricApi = {};
 Vector = ComputeFunctionHelpers.gauss.Vector;
 Collection = ComputeFunctionHelpers.gauss.Collection;
 
-metricApi.Metrics = function() {
-	return {
-		find: function(path) {
-			return Metrics.findMetricByPath(path);
-		}
+/*
+ * Why separate types of Record/RecordImpl and Metrics/MetricsImpl?
+ * Simply because, people, and by people I mean me, will forget to insert the "new" keyword
+ * And because JavaScript just keeps chugging along at all costs, the error won't announce itself like a dinner guest, rather quietly lurk in the background and strike at sometime when the path is not set in a Metric.
+ */
+metricApi.Records = function(path) {
+	return new metricApi.RecordsImpl(path);
+}
+metricApi.Metrics = function(path) {
+	return new metricApi.MetricsImpl(path);
+}
+
+metricApi.MetricsImpl = function(path) {
+	this.query = {};
+	this.query.path = path;
+}
+metricApi.MetricsImpl.prototype.find = function() {
+	var metric = Metrics.findMetricByPath(this.query.path);
+	return metric;
+}
+
+
+metricApi.RecordsImpl = function(path) {
+	this.path = path;
+	this.query = {
+		categoryId: null,
+		// timestamp
 	};
-};
+}
+metricApi.RecordsImpl.prototype.since = function(sinceStr, field) {
+	var date = Date.create(sinceStr).getTime();
+	if(field && field.length > 0) this.query["fields." + field] = { $gte : date };
+	else this.query.timestamp = { $gte : date };
+	return this;
+}
+metricApi.RecordsImpl.prototype.find = function() {
+	var category = Categories.findCategoryByPath(this.path);
+	
+	this.query.categoryId = category._id;
+	console.log(JSON.stringify(this.query));
+	return MetricRecords(Records.find(this.query).fetch());
+}
 
-metricApi.Records = function() {
-	return {
-		query: {
-			categoryId: null
-			// timestamp
-		},
-
-		since: function(sinceStr, field) {
-			var date = Date.create(sinceStr).getTime();
-			if(field && field.length > 0) this.query["fields." + field] = { $gte : date };
-			else this.query.timestamp = { $gte : date };
-			return this;
-		},
-
-		find: function(path) {
-			var category = Categories.findCategoryByPath(path);
-			this.query.categoryId = category._id;
-			console.log(JSON.stringify(this.query));
-			return MetricRecords(Records.find(this.query).fetch());
-		}
-	};
-};
 
 function MetricRecords(values) {
 	var metricRecords = new Vector(values);
@@ -205,11 +235,11 @@ Metrics.runComputeFunction = function(computeFunctionCodeString) {
 			'metric',
 			computeFunctionCodeString);
 		metric = new func(
-			metricApi.Metrics(),
-			metricApi.Records(),
+			metricApi.Metrics,
+			metricApi.Records,
 			metric);
 	} catch(ex) {
 		throw new Meteor.Error("runtime-error", "Your code failed to run when we tested it: " + ex.toString(), ex.stack);
 	}
-	return metric.result;
+	return metric;
 }

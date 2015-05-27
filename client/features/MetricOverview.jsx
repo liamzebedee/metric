@@ -27,28 +27,17 @@ MetricOverview = ReactMeteor.createClass({
 		Meteor.call('recomputeMetric', this.getMetricId());
 	},
 
-	getDependencies: function(){
-		var self = this;
-		Meteor.call('getDependencies', this.state.metric.compute, function(err, result){
-			if(err) {
-				throw err;
-			} else {
-				self.setState({ deps: JSON.stringify(result) });
-			}
-		});
-	},
-
 	render: function() {
 		if(this.state.metric) {
 			var categoryPath = Categories.findOne(this.state.metric.categoryId).path;
 			var loadedMetricView = <AddMetric name={this.state.metric.name} categoryText={categoryPath.join('/')} computeFunctionString={this.state.metric.compute} newMetric={false}/>;
+			var deps = JSON.stringify({ metrics: this.state.metric.metricDependencies, records: this.state.metric.recordDependencies });
 		}
 		return (
 			<div className="niceish-padding"><div className="ui segment">
 				<h1>Metric Overview</h1>
 
 				<button onClick={this.recomputeMetric}>Recompute</button>
-				<button onClick={this.getDependencies}>Get deps</button>
 				
 				{this.state.metric ? 
 					<div>
@@ -56,7 +45,7 @@ MetricOverview = ReactMeteor.createClass({
 					<UI.Metric name={this.state.metric.name} categoryPath={categoryPath} computeResult={this.state.metric.computeResult} _id={this.state.metric._id} />
 					</div></div></div>
 
-					<pre>{this.state.deps}</pre>
+					<pre>{deps}</pre>
 					</div>
 				: "" }
 			</div>

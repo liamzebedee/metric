@@ -44,7 +44,7 @@ UI.Metric = ReactMeteor.createClass({
 				var isPercentage = result.between(0, 1, true);
 				resultView = isPercentage ?
 							(result*100).toFixed(1)+'%' :
-							result;
+							result.toFixed(2);
 				break;
 			
 			case 'boolean':

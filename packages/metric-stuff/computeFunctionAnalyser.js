@@ -16,17 +16,17 @@ ComputeFunctionAnalyser.getDependencies = function(computeFunctionCodeString) {
 	};
 
 	walk(ast, function(node) {
-		if(node.type == 'CallExpression' && node.callee.type == "MemberExpression") {
-			var name = node.callee.object.name;
-			var prop = node.callee.property.name;
+		if(node.type == 'CallExpression' && node.callee.type == "Identifier") {
+			var name = node.callee.name;
+			// 0th argument is always the path
 
-			if(name == 'Metrics' && prop == 'find') {
-				// Metrics.find(path)
+			if(name == 'Metrics') {
+				// Metrics(path)
 				var dependencyString = eval(escodegen.generate(node.arguments[0]));
 				dependencies.metrics.push(dependencyString);
 
-			} else if(name == 'Records' && prop == 'find') {
-				// Records.find(category)
+			} else if(name == 'Records') {
+				// Records(category)
 				var dependencyString = eval(escodegen.generate(node.arguments[0]));
 				dependencies.records.push(dependencyString);
 			}
