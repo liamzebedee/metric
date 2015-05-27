@@ -311,6 +311,13 @@ SearchInput = ReactMeteor.createClass({
 
 
 UI.CategorySearchInput = ReactMeteor.createClass({
+	getDefaultProps: function(){
+		return {
+			onSelect: function(){},
+			onValueChange: function(){}
+		};
+	},
+
 	searchForCategory: function(searchText, callback) {
 		// var modifiers = 'ig';
 		// var pattern = '[a-zA-Z\/ -]*';
@@ -346,19 +353,17 @@ UI.CategorySearchInput = ReactMeteor.createClass({
 		event.preventDefault(); // prevent form submit
 	},
 
-	addNewCategory: function() {
-		Categories.findOrCreateByCategoryPath(this.state.currentCategory);
-	},
+	onChange: function(value) { this.props.onSelect(value); },
 
 	render: function() {
 		var self = this;
 		var inputAttributes = {
-			value: this.props.category
+			value: this.props.category,
+			onChange: self.onChange
 		};
 		return (
 			<div className="ui action input">
 				<Autosuggest ref="autosuggest" placeholder="/Health/Physical/Diabetes/Blood Glucose Levels" suggestions={this.searchForCategory} inputAttributes={inputAttributes} onSuggestionSelected={this.onSuggestionSelected}/>
-				<button className={Util.classNames("ui button")} onClick={this.addNewCategory}><i className="add circle icon"></i>Create</button>
 			</div>
 		);
 	}

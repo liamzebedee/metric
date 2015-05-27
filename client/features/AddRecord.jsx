@@ -34,7 +34,7 @@ AddRecord = ReactMeteor.createClass({
 			},
 
 			fields: [
-				{ fieldName: "timestamp", value: new Date }
+				{ fieldName: "Time", value: new Date }
 			]
 
 	    };
@@ -108,7 +108,13 @@ AddRecord = ReactMeteor.createClass({
 	changeCategory: function(category) {
 		var newState = {};
 		newState.categoryText = category;
-		newState.fields = Categories.findCategoryByPath(category).schema;
+		try {
+			newState.fields = Categories.findCategoryByPath(category).schema;
+		} catch(ex) {
+			newState.fields = [
+				{ fieldName: "Time", value: new Date }
+			];
+		}
 		this.setState(newState);
 	},
 

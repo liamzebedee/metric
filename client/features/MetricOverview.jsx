@@ -27,6 +27,10 @@ MetricOverview = ReactMeteor.createClass({
 		Meteor.call('recomputeMetric', this.getMetricId());
 	},
 
+	remove: function(){
+		Metrics.remove(this.state.metric._id);
+	},
+
 	render: function() {
 		if(this.state.metric) {
 			var categoryPath = Categories.findOne(this.state.metric.categoryId).path;
@@ -38,7 +42,8 @@ MetricOverview = ReactMeteor.createClass({
 				<h1>Metric Overview</h1>
 
 				<button onClick={this.recomputeMetric}>Recompute</button>
-				
+				<button onClick={this.remove}>Remove</button>
+
 				{this.state.metric ? 
 					<div>
 					<div className="ui card"><div className="content"><div className="ui statistics">

@@ -178,8 +178,16 @@ metricApi.MetricsImpl = function(path) {
 	this.query.path = path;
 }
 metricApi.MetricsImpl.prototype.find = function() {
-	var metric = Metrics.findMetricByPath(this.query.path);
+	var metric = MetricPrettyWrapper(Metrics.findMetricByPath(this.query.path));
 	return metric;
+}
+
+function MetricPrettyWrapper(metric) {
+	if(metric.computeResult === undefined) var self = {};
+	else var self = metric.computeResult;
+	self.result = metric.computeValue;
+	self.metric = metric;
+	return self;
 }
 
 
@@ -215,7 +223,11 @@ function MetricRecords(values) {
 
 		// 	}
 		// }
-		return metricRecords.map(function(record){ return record.fields[fieldName]; });
+		return metricRecords.map(function(record){
+			var f = record.fields[fieldName];
+			if(f === undefined) throw new Error("Field doesn't exist: '"+fieldName+"'");
+			return f;
+		});
 	};
 	metricRecords.average = metricRecords.mean;
 	return metricRecords;

@@ -30,11 +30,18 @@ RecordsOverview = ReactMeteor.createClass({
 
 	getCategoryId: function(){ return this.context.router.getCurrentParams().id; },
 
+	removeRecord: function(i) {
+		Records.remove(this.state.records[i]._id);
+	},
+
 	render: function() {
+		var self = this;
+
 		header = [];
 		this.state.category.schema.forEach(function(field, i){
 			header.push(<th key={i}>{field.fieldName}</th>);
 		});
+		header.push(<th key={'controls'}>Controls</th>);
 		bodyRows = [];
 		this.state.records.forEach(function(record, i){
 			var fields = [];
@@ -42,6 +49,7 @@ RecordsOverview = ReactMeteor.createClass({
 				var val = record.fields[field];
 				fields.push(<td key={field}>{val}</td>);
 			}
+			fields.push(<th key={'controls'}><button className="icon button" onClick={self.removeRecord.bind(self, i)}><Icon n="remove cross"/></button></th>);
 			bodyRows.push(<tr key={i}>{fields}</tr>);
 		});
 

@@ -7,7 +7,14 @@
 }
 
 #root {
-	  min-height: 100%;
+  min-height: 100%;
+  background: url(http://subtlepatterns.com/patterns/escheresque_ste.png);
+  /*background: url(http://subtlepatterns.com/patterns/hexabump.png);*/
+  /*background: url(http://subtlepatterns.com/patterns/low_contrast_linen.png);*/
+  /*background: url(http://subtlepatterns.com/patterns/footer_lodyas.png);*/
+  /*background: url(http://subtlepatterns.com/patterns/subtle_zebra_3d.png);*/
+  /*background: url(http://subtlepatterns.com/patterns/dark_geometric.png);*/
+
 }
 
 .metric-card {
