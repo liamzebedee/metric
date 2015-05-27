@@ -1,7 +1,8 @@
 {metric}
 ========
 
-Not yet functional - [Progress through Tumblr screenshots](http://liamz.tumblr.com/tagged/metric)
+
+**Status:** "core functionality complete", working towards [Alpha](https://github.com/liamzebedee/metric/milestones/Alpha) - [Progress through Tumblr screenshots](http://liamz.tumblr.com/tagged/metric)
 
 !["Dashboard" Screenshot as of 26/05/2015](https://41.media.tumblr.com/3e2f50eaf28999fbe9b7e116e2ab4c89/tumblr_noy93v35L11trskuwo2_1280.png)
 !["Add Record" Screenshot as of 17/05/2015](https://40.media.tumblr.com/a93b26f29eeac4e596c3b51775a1a61c/tumblr_nog6cpNW5H1trskuwo2_1280.png)
