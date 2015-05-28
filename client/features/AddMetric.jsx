@@ -125,13 +125,16 @@ AddMetric = ReactMeteor.createClass({
 					
 	  			</div>
 
-	  			<h2 className="ui dividing header"><Icon n="code"/><div className="content">Compute function</div></h2>
-	  			<a href="https://github.com/liamzebedee/metric/wiki/Writing-a-metric" target="_blank"><Icon n="info circle"/> Docs</a>
-	  			
-				{runtimeError}
+	  			<div className="ui segment">
+		  			<h2 className="ui dividing header"><Icon n="code"/><div className="content">Compute function</div></h2>
+		  			<a href="https://github.com/liamzebedee/metric/wiki/Writing-a-metric" target="_blank"><Icon n="info circle"/> Docs</a>
 
-				<UI.JSEditor code={this.state.computeFunctionString} 
-					    	 onValidation={this.onEditorValidation}/>
+					{runtimeError}
+
+
+					<UI.JSEditor code={this.state.computeFunctionString} 
+						    	 onValidation={this.onEditorValidation}/>
+				</div>
 	  		</div>
 		);
 	}

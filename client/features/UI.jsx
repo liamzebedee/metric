@@ -261,7 +261,7 @@ UI.JSEditor = ReactMeteor.createClass({
 
 	render: function() {
 		return (
-			<div id='code-editor' className="ui container">
+			<div id='code-editor'>
 		    <div className='code-editor-left'></div>
 		  </div>
 	  );

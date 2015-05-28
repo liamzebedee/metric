@@ -229,7 +229,18 @@ function MetricRecords(values) {
 			return f;
 		});
 	};
-	metricRecords.average = metricRecords.mean;
+	metricRecords.average = function() {
+		var type = Util.getObjectType(metricRecords[0]);
+		switch(type){
+			case "object": throw new Error("Can only average numbers and booleans"); break;
+			case 'boolean':
+				// custom average
+				var sum = 0;
+				metricRecords.foreach(function(item){ if(item) sum++; });
+				return (sum / metricRecords.length);
+			default: return metricRecords.mean();
+		}
+	};
 	return metricRecords;
 }
 
