@@ -1,0 +1,78 @@
+#!/usr/bin/env node
+
+/**
+     _/_/_/    _/_/_/  _/    _/    _/_/_/    _/_/_/
+  _/    _/  _/    _/  _/    _/  _/_/      _/_/
+ _/    _/  _/    _/  _/    _/      _/_/      _/_/
+  _/_/_/    _/_/_/    _/_/_/  _/_/_/    _/_/_/
+     _/
+_/_/
+
+Gauss: JavaScript statistics, analytics, and set library - Node.js and web browser ready
+Copyright (c) 2014 Fredrick Galoso http://fredrickgaloso.me/
+
+Permission is hereby granted, free of charge, to any person obtaining
+a copy of this software and associated documentation files (the
+"Software"), to deal in the Software without restriction, including
+without limitation the rights to use, copy, modify, merge, publish,
+distribute, sublicense, and/or sell copies of the Software, and to
+permit persons to whom the Software is furnished to do so, subject to
+the following conditions:
+
+The above copyright notice and this permission notice shall be
+included in all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE
+LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
+OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
+WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+**/
+
+var util = require('util'),
+    repl = require('repl'),
+    exec = require('child_process').exec,
+    gauss = require('../lib/gauss'),
+    Collection = require('../lib/collection'),
+    Vector = require('../lib/vector'),
+    TimeSeries = require('../lib/timeseries');
+
+var session = repl.start('gauss> ', null, null, null, true);
+session.context.gauss = gauss;
+session.context.Collection = Collection;
+session.context.Vector = Vector;
+session.context.TimeSeries = TimeSeries;
+
+// Helpful utilities
+session.context.print = console.log;
+session.context.inspect = util.inspect;
+session.context.cwd = process.cwd;
+
+session.context.install = function(name) {
+  exec('npm install ' + name.toString(), function(error, stdout, stderr) {
+    process.stdout.write(stdout + '\r');
+  });
+};
+
+session.context.uninstall = function(name) {
+  exec('npm uninstall ' + name.toString(), function(error, stdout, stderr) {
+    process.stdout.write(stdout);
+  });
+};
+
+session.context.help = function(command) {
+  var banner = 'Gauss '+ gauss.version +'\n \
+  /* https://github.com/wayoutmind/gauss#api */ \n \
+  Functions: print, inspect, cwd, clear, install, uninstall, help\n \
+  Usage:\n \
+    var set = new Vector(1, 2, 3);\n \
+    var times = new gauss.TimeSeries();';
+  console.log(banner);
+  return gauss;
+};
+
+session.context.clear = function() {
+  process.stdout.write('\u001B[2J\u001B[0;0f');
+}

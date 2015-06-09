@@ -1,0 +1,117 @@
+.react-autosuggest {
+  position: relative;
+}
+.react-autosuggest input {
+  width: 240px;
+  height: 30px;
+  padding: 10px 20px;
+  font-size: 18px;
+  border: 1px solid #aaaaaa;
+  border-radius: 4px;
+}
+.react-autosuggest input[aria-expanded="true"] {
+  border-bottom-left-radius: 0;
+  border-bottom-right-radius: 0;
+}
+.react-autosuggest input:focus {
+  outline: none;
+}
+.react-autosuggest__suggestions {
+  position: absolute;
+  top: 51px;
+  width: 280px;
+  border: 1px solid #aaaaaa;
+  background-color: #fff;
+  font-size: 18px;
+  border-bottom-left-radius: 4px;
+  border-bottom-right-radius: 4px;
+  z-index: 2;
+}
+.react-autosuggest__suggestions-section:first-child .react-autosuggest__suggestions-section-name {
+  border-top: 0;
+}
+.react-autosuggest__suggestions-section-name {
+  padding: 10px 0 0 10px;
+  font-size: 12px;
+  text-transform: uppercase;
+  color: #777;
+  border-top: 1px dashed #ccc;
+}
+.react-autosuggest__suggestion {
+  cursor: pointer;
+  padding: 10px 20px;
+}
+.react-autosuggest__suggestion--focused {
+  background-color: #ddd;
+}
+.badges {
+  margin-bottom: 50px;
+}
+.badges a {
+  margin-right: 5px;
+}
+.examples {
+  display: flex;
+}
+.examples-menu {
+  margin-right: 30px;
+  padding: 10px 50px 20px 0;
+  font-size: 18px;
+  border-radius: 4px;
+}
+.examples-menu__item {
+  padding: 5px 0;
+  color: #777;
+  cursor: pointer;
+}
+.examples-menu__item--active {
+  color: #ff0000;
+  cursor: default;
+}
+.footer {
+  display: flex;
+  flex-grow: 1;
+  align-items: flex-end;
+  margin-bottom: 30px;
+  line-height: 32px;
+}
+.footer img {
+  margin-right: 5px;
+  border-radius: 4px;
+}
+.footer strong {
+  color: red;
+}
+.footer a {
+  text-decoration: none;
+  color: #3ba3d7;
+}
+.source-code-link {
+  float: right;
+  text-decoration: none;
+  color: #3ba3d7;
+  font-size: 12px;
+  margin-top: 3px;
+  margin-right: 5px;
+}
+html,
+body {
+  display: flex;
+  justify-content: center;
+  height: 100%;
+  margin: 0;
+}
+#app {
+  display: flex;
+  justify-content: center;
+  font-family: 'Helvetica Neue', Helvetica, Arial;
+  width: 500px;
+  padding: 0 40px;
+  border-left: 1px dashed #777;
+  border-right: 1px dashed #777;
+}
+#app > div {
+  display: flex;
+  flex-direction: column;
+  position: relative;
+}

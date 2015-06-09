@@ -1,0 +1,101 @@
+{
+  "format": "web-program-pre1",
+  "manifest": [
+    {
+      "path": "ef1c5e8af20e8d86efa0f89aa3762e20dcf73a1c.js",
+      "where": "client",
+      "type": "js",
+      "cacheable": true,
+      "url": "/ef1c5e8af20e8d86efa0f89aa3762e20dcf73a1c.js",
+      "size": 888262,
+      "hash": "ef1c5e8af20e8d86efa0f89aa3762e20dcf73a1c"
+    },
+    {
+      "path": "f5c77398a5d1f814e8dc287315267d5c2d5abc3e.css",
+      "where": "client",
+      "type": "css",
+      "cacheable": true,
+      "url": "/f5c77398a5d1f814e8dc287315267d5c2d5abc3e.css?meteor_css_resource=true",
+      "size": 496729,
+      "hash": "f5c77398a5d1f814e8dc287315267d5c2d5abc3e"
+    },
+    {
+      "path": "packages/semantic_ui-css/themes/default/assets/fonts/icons.eot",
+      "where": "client",
+      "type": "asset",
+      "cacheable": false,
+      "url": "/packages/semantic_ui-css/themes/default/assets/fonts/icons.eot",
+      "size": 60767,
+      "hash": "3e63fc9b3de4580f1f3bec0631436f755b80f167"
+    },
+    {
+      "path": "packages/semantic_ui-css/themes/default/assets/fonts/icons.svg",
+      "where": "client",
+      "type": "asset",
+      "cacheable": false,
+      "url": "/packages/semantic_ui-css/themes/default/assets/fonts/icons.svg",
+      "size": 313398,
+      "hash": "26bb1c5ef100a1cd71923f1d5dc29fc797ef4639"
+    },
+    {
+      "path": "packages/semantic_ui-css/themes/default/assets/fonts/icons.ttf",
+      "where": "client",
+      "type": "asset",
+      "cacheable": false,
+      "url": "/packages/semantic_ui-css/themes/default/assets/fonts/icons.ttf",
+      "size": 122092,
+      "hash": "9088143b19979779b2116cef38b661f72d982e19"
+    },
+    {
+      "path": "packages/semantic_ui-css/themes/default/assets/fonts/icons.woff",
+      "where": "client",
+      "type": "asset",
+      "cacheable": false,
+      "url": "/packages/semantic_ui-css/themes/default/assets/fonts/icons.woff",
+      "size": 71508,
+      "hash": "56ce13e71c2150d81bc972940584915181bd6081"
+    },
+    {
+      "path": "packages/semantic_ui-css/themes/default/assets/fonts/icons.woff2",
+      "where": "client",
+      "type": "asset",
+      "cacheable": false,
+      "url": "/packages/semantic_ui-css/themes/default/assets/fonts/icons.woff2",
+      "size": 56780,
+      "hash": "1075231650f579955905bb2f6527148a8e2b4b16"
+    },
+    {
+      "path": "packages/semantic_ui-css/themes/default/assets/images/flags.png",
+      "where": "client",
+      "type": "asset",
+      "cacheable": false,
+      "url": "/packages/semantic_ui-css/themes/default/assets/images/flags.png",
+      "size": 28123,
+      "hash": "4a552ecb123ded5040ddda01d626103cc65db055"
+    },
+    {
+      "path": "packages/reactjs_react/vendor/react-with-addons-0.13.0.js",
+      "where": "client",
+      "type": "asset",
+      "cacheable": false,
+      "url": "/packages/reactjs_react/vendor/react-with-addons-0.13.0.js",
+      "size": 659449,
+      "hash": "12dcf46c14c78cb666a01e3142a705aa6ace3e7c"
+    },
+    {
+      "path": "packages/reactjs_react/vendor/react-with-addons-0.13.0.min.js",
+      "where": "client",
+      "type": "asset",
+      "cacheable": false,
+      "url": "/packages/reactjs_react/vendor/react-with-addons-0.13.0.min.js",
+      "size": 131176,
+      "hash": "2a5a4575570bdc4073274b6bde154b88d1f8422e"
+    },
+    {
+      "path": "head.html",
+      "where": "internal",
+      "type": "head",
+      "hash": "d0579cba96f717ad7583dca46d6c773a74e9fd4e"
+    }
+  ]
+}
