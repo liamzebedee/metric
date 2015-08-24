@@ -30,7 +30,7 @@ Key points:
 Later when functional I'll bundle it up as an single-file app.
 
 ## License
-Copyright Liam Edwards-Playne 2015. Licensed under [Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International License](http://creativecommons.org/licenses/by-nc-sa/4.0/), which means you **can't use it for commercial purposes** without my written permission.
+Copyright Liam Edwards-Playne 2015. Licensed under [Creative Commons Attribution-Sharealike 4.0 International License](http://creativecommons.org/licenses/by-sa/4.0/) and GPL v3.
 
 
 ## Development practices
