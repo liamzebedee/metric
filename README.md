@@ -1,6 +1,7 @@
 {metric}
 ========
 
+A post-mortem -- [Metric: Building a quantitative self app in Meteor and React](http://liamz.co/2015/08/metric-building-a-quantitative-self-app-in-meteor-and-react/)
 
 **Status:** "core functionality complete", working towards [Alpha](https://github.com/liamzebedee/metric/milestones/Alpha) - [Progress through Tumblr screenshots](http://liamz.tumblr.com/tagged/metric)
 
